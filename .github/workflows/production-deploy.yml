@@ -1,0 +1,106 @@
+name: Production Docker Image Deploy
+on:
+  push:
+    branches:
+      - production
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Upload workspace
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace
+          path: .
+          retention-days: 1
+          include-hidden-files: true
+
+  build-image:
+    needs: prepare
+    runs-on: ubuntu-latest
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Download workspace
+        uses: actions/download-artifact@v4
+        with:
+          name: workspace
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PAT }}
+
+      - name: Build and push image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: salyangoz/yengec-developer-hub:latest
+          cache-from: type=registry,ref=salyangoz/yengec-developer-hub:buildcache
+          cache-to: type=registry,ref=salyangoz/yengec-developer-hub:buildcache,mode=max
+
+  deploy:
+    needs:
+      - build-image
+    runs-on: app-runner
+    steps:
+      - name: Sync Docker Hub pull secret
+        run: |
+          kubectl create secret docker-registry dockerhub-pull-secret \
+            --docker-server=https://index.docker.io/v1/ \
+            --docker-username='${{ secrets.DOCKER_USERNAME }}' \
+            --docker-password='${{ secrets.DOCKER_PAT }}' \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Apply manifests
+        run: kubectl apply -f k8s/all.yaml
+
+      # Pin the exact digest just pushed, force fresh pods, and wait so a bad
+      # deploy fails loudly instead of leaving old pods behind a green check.
+      - name: Rollout app
+        run: |
+          kubectl set image deployment/yengec-developer-hub yengec-developer-hub=salyangoz/yengec-developer-hub@${{ needs.build-image.outputs.digest }}
+          kubectl rollout restart deployment/yengec-developer-hub
+          kubectl rollout status deployment/yengec-developer-hub --timeout=300s
+
+      - name: Verify deployed image digest
+        run: |
+          expected="salyangoz/yengec-developer-hub@${{ needs.build-image.outputs.digest }}"
+          deployed=$(kubectl get deployment yengec-developer-hub -o jsonpath='{.spec.template.spec.containers[0].image}')
+          echo "yengec-developer-hub -> $deployed"
+          if [ "$deployed" != "$expected" ]; then
+            echo "::error::yengec-developer-hub spec image is $deployed, expected $expected"
+            exit 1
+          fi
+
+  notify:
+    needs:
+      - deploy
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_TITLE: Yengeç Developer Hub — deploy
+          SLACK_COLOR: ${{ needs.deploy.result }}
+          SLACK_USERNAME: GitHub Actions
+          SLACK_MESSAGE: |
+            Developer Hub canlıya alındı!
+            Durum: ${{ needs.deploy.result }}
+            Commit: ${{ github.event.head_commit.message }}

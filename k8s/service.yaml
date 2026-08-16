@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: yengec-developer-hub
+spec:
+  type: ClusterIP
+  selector:
+    app: yengec-developer-hub
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP

@@ -1,0 +1,7177 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Yengeç Developer API",
+    "description": "Yengec is a marketplace integration and inventory management platform.\nThis API allows you to manage companies, products, orders, integrations,\ncustomers, subscriptions, and more.\n\n## Authentication\nMost endpoints require a Bearer token obtained via the `POST /v2.0/auth/token` endpoint.\nInclude the token in the `Authorization` header:\n```\nAuthorization: Bearer <your_access_token>\n```\n\n## Pagination\nThe API uses two pagination styles:\n\n**Offset-based pagination** (most list endpoints):\nUse `?page=N&limit=N` query parameters. The response includes:\n```json\n{\n  \"data\": [...],\n  \"meta\": {\n    \"pagination\": {\n      \"total\": 100,\n      \"count\": 20,\n      \"per_page\": 20,\n      \"current_page\": 1,\n      \"total_pages\": 5\n    }\n  }\n}\n```\n\n**Cursor-based pagination** (notifications, some endpoints):\nUse `?limit=N&cursor=...` query parameters. The response includes:\n```json\n{\n  \"data\": [...],\n  \"meta\": {\n    \"pagination\": {\n      \"count\": 20,\n      \"per_page\": 20,\n      \"next_cursor\": \"eyJ...\",\n      \"prev_cursor\": null\n    }\n  }\n}\n```\n\n## Rate Limiting\nAPI requests are rate-limited to 2,000 requests per minute per client.\n\n## Base URL\nAll endpoints are prefixed with `/v1.0` or `/v2.0` as indicated.\n\n## Common Response Format\nAll responses follow the Fractal/Dingo format:\n```json\n{\n  \"data\": { ... }\n}\n```\nFor paginated lists:\n```json\n{\n  \"data\": [ ... ],\n  \"meta\": {\n    \"pagination\": {\n      \"total\": 100,\n      \"count\": 20,\n      \"per_page\": 20,\n      \"current_page\": 1,\n      \"total_pages\": 5\n    }\n  }\n}\n```\n",
+    "version": "2.0.0",
+    "contact": {
+      "name": "Yengec Support",
+      "url": "https://yengec.co"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.yengec.co",
+      "description": "Production"
+    },
+    {
+      "url": "https://api-test.yengec.co",
+      "description": "Staging"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "User registration, login, 2FA, and OAuth provider authentication"
+    },
+    {
+      "name": "User",
+      "description": "Current user profile, notifications, and preferences"
+    },
+    {
+      "name": "Credit Card",
+      "description": "Saved credit card management"
+    },
+    {
+      "name": "Company",
+      "description": "Company management, users, accounting connections"
+    },
+    {
+      "name": "Product",
+      "description": "Product CRUD, bulk operations, stock, images, AI features, and integration sync"
+    },
+    {
+      "name": "Order",
+      "description": "Order CRUD, bulk operations, invoicing, and accounting push"
+    },
+    {
+      "name": "Order Shipping",
+      "description": "Shipping, cargo, fulfillment, and order package operations"
+    },
+    {
+      "name": "Integration",
+      "description": "Marketplace integration management, configuration, sync"
+    },
+    {
+      "name": "Integration Product",
+      "description": "Integration product listing and mapping"
+    },
+    {
+      "name": "Integration Category",
+      "description": "Integration marketplace categories"
+    },
+    {
+      "name": "Integration Property",
+      "description": "Integration product properties and options"
+    },
+    {
+      "name": "Integration Warehouse",
+      "description": "Integration warehouse mapping"
+    },
+    {
+      "name": "Customer",
+      "description": "Customer/contact management, accounting push, payments"
+    },
+    {
+      "name": "Subscription",
+      "description": "Subscription and billing management"
+    },
+    {
+      "name": "Report",
+      "description": "Sales, income, expense, and product reports"
+    },
+    {
+      "name": "Tag",
+      "description": "Tag management for orders, customers, and products"
+    },
+    {
+      "name": "Task",
+      "description": "Background task monitoring"
+    },
+    {
+      "name": "Warehouse",
+      "description": "Warehouse management"
+    },
+    {
+      "name": "Account",
+      "description": "Financial account and transaction management"
+    },
+    {
+      "name": "Product Category",
+      "description": "Product category management and property mapping"
+    },
+    {
+      "name": "XML Resource",
+      "description": "XML feed import management"
+    },
+    {
+      "name": "Invoice",
+      "description": "Platform invoice management"
+    },
+    {
+      "name": "Question",
+      "description": "Marketplace customer questions and answers"
+    },
+    {
+      "name": "Credit",
+      "description": "Credit balance and usage"
+    },
+    {
+      "name": "Purchase",
+      "description": "Purchase management"
+    },
+    {
+      "name": "E-Invoice",
+      "description": "E-invoice application"
+    },
+    {
+      "name": "Global",
+      "description": "Public endpoints (no auth required)"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": [],
+      "apiKeyClientId": [],
+      "apiKeyClientSecret": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "apiKeyClientId": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "client-id",
+        "description": "OAuth client ID from Passport"
+      },
+      "apiKeyClientSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "client-secret",
+        "description": "OAuth client secret from Passport"
+      }
+    },
+    "parameters": {
+      "companyId": {
+        "name": "companyId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "The ID of the company."
+      },
+      "integrationId": {
+        "name": "integrationId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        },
+        "description": "The ID of the integration."
+      },
+      "limit": {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "description": "Number of items per page",
+        "schema": {
+          "type": "integer",
+          "default": 20
+        }
+      },
+      "page": {
+        "name": "page",
+        "in": "query",
+        "required": false,
+        "description": "Page number (offset-based pagination)",
+        "schema": {
+          "type": "integer",
+          "default": 1
+        }
+      },
+      "productId": {
+        "name": "productId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "Product UUID"
+      },
+      "productImportId": {
+        "name": "productImportId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        },
+        "description": "Product import ID"
+      },
+      "jobId": {
+        "name": "jobId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "Job ID"
+      },
+      "orderId": {
+        "name": "orderId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "The order identifier."
+      },
+      "orderPackageId": {
+        "name": "orderPackageId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "The order package identifier."
+      }
+    },
+    "schemas": {
+      "PaginationMeta": {
+        "type": "object",
+        "description": "Offset-based pagination metadata (used by most list endpoints)",
+        "properties": {
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer"
+              },
+              "count": {
+                "type": "integer"
+              },
+              "per_page": {
+                "type": "integer"
+              },
+              "current_page": {
+                "type": "integer"
+              },
+              "total_pages": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "CursorPaginationMeta": {
+        "type": "object",
+        "description": "Cursor-based pagination metadata (used by notifications and some endpoints)",
+        "properties": {
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "type": "integer"
+              },
+              "per_page": {
+                "type": "integer"
+              },
+              "next_cursor": {
+                "type": "string",
+                "nullable": true
+              },
+              "prev_cursor": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "mobile": {
+            "type": "string",
+            "nullable": true
+          },
+          "provider": {
+            "type": "string",
+            "nullable": true
+          },
+          "is_email_verified": {
+            "type": "boolean"
+          },
+          "is_mobile_verified": {
+            "type": "boolean"
+          },
+          "mobile_notification": {
+            "type": "boolean"
+          },
+          "permissions": {
+            "type": "object"
+          },
+          "channel": {
+            "type": "string"
+          },
+          "has_password": {
+            "type": "boolean"
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "tr",
+              "en"
+            ]
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "unread_notification_count": {
+            "type": "integer"
+          }
+        }
+      },
+      "Company": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "nullable": true
+          },
+          "channel": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "TRY",
+              "USD",
+              "EUR",
+              "GBP"
+            ]
+          },
+          "logo_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "settings": {
+            "type": "object",
+            "nullable": true
+          },
+          "district": {
+            "type": "string",
+            "nullable": true
+          },
+          "postal_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "tax_office": {
+            "type": "string",
+            "nullable": true
+          },
+          "tax_number": {
+            "type": "string"
+          },
+          "accounting": {
+            "type": "string",
+            "nullable": true
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "website_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "ioss": {
+            "type": "string",
+            "nullable": true
+          },
+          "voec": {
+            "type": "string",
+            "nullable": true
+          },
+          "pva": {
+            "type": "string",
+            "nullable": true
+          },
+          "mid": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_invoice_serial": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_archive_serial": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_invoice_credit": {
+            "type": "integer"
+          },
+          "e_invoice_provider": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_invoicing_activated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "e_archiving_activated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "main",
+              "basic",
+              "variant",
+              "expense"
+            ]
+          },
+          "price": {
+            "type": "number",
+            "format": "float"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "barcode": {
+            "type": "string",
+            "nullable": true
+          },
+          "weight": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "hs_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "variant": {
+            "type": "object",
+            "nullable": true
+          },
+          "tax_rate": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              10,
+              20
+            ]
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "deleted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "child_count": {
+            "type": "integer"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "stock_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "catalog": {
+            "type": "object",
+            "nullable": true,
+            "description": "null=unchecked, {count:0}=no match, {count:N,matches:[...]}=matched"
+          },
+          "warehouse_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "market_price": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "shipment_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "fulfillment_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "parent_product_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "product_category_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "integration_product_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "source_integration_id": {
+            "type": "integer",
+            "nullable": true
+          }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "order_id": {
+            "type": "string"
+          },
+          "order_id2": {
+            "type": "string",
+            "nullable": true
+          },
+          "group_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
+          },
+          "status_readable": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_invoice_status": {
+            "type": "string"
+          },
+          "e_invoice_document_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "invoice_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_invoice_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "discount_amount": {
+            "type": "number",
+            "format": "float"
+          },
+          "last_error": {
+            "type": "string",
+            "nullable": true
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "push_ready": {
+            "type": "boolean"
+          },
+          "einvoice_created_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "pushed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "order_created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "final_amount": {
+            "type": "number",
+            "format": "float"
+          },
+          "is_printed": {
+            "type": "boolean"
+          },
+          "customer_info": {
+            "type": "object"
+          },
+          "payment_method": {
+            "type": "string",
+            "nullable": true
+          },
+          "payment_method_readable": {
+            "type": "string",
+            "nullable": true
+          },
+          "payment_provider": {
+            "type": "string",
+            "nullable": true
+          },
+          "cargo_company_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "cargo_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "cargo_tracking_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "cargo_tracking_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "has_shipping": {
+            "type": "boolean"
+          },
+          "integration_id": {
+            "type": "integer"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "sale",
+              "return",
+              "cancel"
+            ]
+          },
+          "archived_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "issue_date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "due_date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "fulfillment_status": {
+            "type": "string",
+            "nullable": true
+          },
+          "exchange_rate": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "paid_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "Integration": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "order",
+              "cargo",
+              "product",
+              "fulfillment"
+            ]
+          },
+          "marketplace": {
+            "type": "string"
+          },
+          "marketplace_readable": {
+            "type": "string"
+          },
+          "subscription_id": {
+            "type": "integer"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "config_completed": {
+            "type": "boolean"
+          },
+          "config": {
+            "type": "object"
+          },
+          "options": {
+            "type": "object"
+          },
+          "domain": {
+            "type": "string",
+            "nullable": true
+          },
+          "website_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "contact_email": {
+            "type": "string",
+            "nullable": true
+          },
+          "cc_email": {
+            "type": "string",
+            "nullable": true
+          },
+          "summary_active": {
+            "type": "boolean"
+          },
+          "e_invoice_active": {
+            "type": "boolean"
+          },
+          "e_invoice_scenario": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "basic",
+              "commercial"
+            ]
+          },
+          "cargo_company_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "make_paid": {
+            "type": "boolean"
+          },
+          "tax_rate": {
+            "type": "number"
+          },
+          "send_invoice_mail": {
+            "type": "boolean"
+          },
+          "invoice_note": {
+            "type": "string",
+            "nullable": true
+          },
+          "email_note": {
+            "type": "string",
+            "nullable": true
+          },
+          "last_error": {
+            "type": "string",
+            "nullable": true
+          },
+          "deleted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "parent_integration_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "use_export_invoice": {
+            "type": "boolean"
+          }
+        }
+      },
+      "IntegrationProduct": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "url": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number",
+            "format": "float"
+          },
+          "weight": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "barcode": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "sync_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "on_sale": {
+            "type": "boolean"
+          },
+          "quantity": {
+            "type": "number",
+            "format": "float"
+          },
+          "tax_rate": {
+            "type": "number",
+            "format": "float"
+          },
+          "stock_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "child_count": {
+            "type": "integer"
+          },
+          "market_price": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "integration_id": {
+            "type": "integer"
+          },
+          "marketplace_id": {
+            "type": "string"
+          },
+          "marketplace_name": {
+            "type": "string"
+          },
+          "properties": {
+            "type": "object",
+            "nullable": true
+          },
+          "use_product_name": {
+            "type": "boolean"
+          },
+          "use_product_price": {
+            "type": "boolean"
+          },
+          "product_synced_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "customer_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "Customer",
+              "Company"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "invoice_address": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "district": {
+            "type": "string",
+            "nullable": true
+          },
+          "tc": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "tax_number": {
+            "type": "string",
+            "nullable": true
+          },
+          "tax_office": {
+            "type": "string",
+            "nullable": true
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "nullable": true
+          },
+          "country_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "postal_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "integration_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "archived_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "is_vendor": {
+            "type": "boolean"
+          },
+          "balance": {
+            "type": "object",
+            "nullable": true
+          }
+        }
+      },
+      "Subscription": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "price": {
+            "type": "number",
+            "format": "float"
+          },
+          "channel": {
+            "type": "string"
+          },
+          "promotion": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "renewal_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deleted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "is_expired": {
+            "type": "boolean"
+          },
+          "renew_month": {
+            "type": "integer"
+          },
+          "package_count": {
+            "type": "integer"
+          },
+          "payment_method": {
+            "type": "string"
+          },
+          "integration_count": {
+            "type": "integer"
+          }
+        }
+      },
+      "Warehouse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "object",
+            "nullable": true
+          },
+          "is_default": {
+            "type": "boolean"
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "Account": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "account",
+              "bank"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "iban": {
+            "type": "string",
+            "nullable": true
+          },
+          "balance": {
+            "type": "number",
+            "format": "float"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "TRY",
+              "USD",
+              "EUR",
+              "GBP"
+            ]
+          },
+          "bank_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "balance_at": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "deleted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "type_readable": {
+            "type": "string"
+          },
+          "currency_symbol": {
+            "type": "string"
+          }
+        }
+      },
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "order",
+              "customer",
+              "product"
+            ]
+          }
+        }
+      },
+      "Task": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "completed",
+              "failed"
+            ]
+          },
+          "progress": {
+            "type": "number"
+          },
+          "result": {
+            "type": "object",
+            "nullable": true
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Package": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "code": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "sort": {
+            "type": "integer"
+          },
+          "price": {
+            "type": "number",
+            "format": "float"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "country": {
+            "type": "string"
+          },
+          "prices": {
+            "type": "object"
+          },
+          "name_en": {
+            "type": "string"
+          },
+          "name_tr": {
+            "type": "string"
+          },
+          "unlimited": {
+            "type": "boolean"
+          },
+          "marketplaces": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "status_code": {
+            "type": "integer"
+          },
+          "errors": {
+            "type": "object"
+          }
+        }
+      },
+      "AccountResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "account",
+              "bank"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "iban": {
+            "type": "string",
+            "nullable": true
+          },
+          "balance": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "bank_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "balance_at": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "deleted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "type_readable": {
+            "type": "string"
+          },
+          "currency_symbol": {
+            "type": "string"
+          }
+        }
+      },
+      "BankResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "connected",
+              "disconnected"
+            ]
+          },
+          "provider": {
+            "type": "string"
+          },
+          "bank_code": {
+            "type": "string"
+          },
+          "bank_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "accounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountResponse"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "nullable": true
+          },
+          "expires_at": {
+            "type": "string",
+            "nullable": true
+          },
+          "deleted_at": {
+            "type": "string",
+            "nullable": true
+          },
+          "redirect_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "connected_at": {
+            "type": "string",
+            "nullable": true
+          },
+          "last_synced_at": {
+            "type": "string",
+            "nullable": true
+          },
+          "disconnect_reason": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "CompanyResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "channel": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "TRY",
+              "USD",
+              "EUR",
+              "GBP"
+            ]
+          },
+          "logo_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "settings": {
+            "type": "object"
+          },
+          "district": {
+            "type": "string"
+          },
+          "postal_code": {
+            "type": "string"
+          },
+          "tax_office": {
+            "type": "string"
+          },
+          "tax_number": {
+            "type": "string"
+          },
+          "accounting": {
+            "type": "string",
+            "nullable": true
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "website_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "ioss": {
+            "type": "string",
+            "nullable": true
+          },
+          "voec": {
+            "type": "string",
+            "nullable": true
+          },
+          "pva": {
+            "type": "string",
+            "nullable": true
+          },
+          "mid": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_invoice_serial": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_archive_serial": {
+            "type": "string",
+            "nullable": true
+          },
+          "abilities": {
+            "type": "object",
+            "description": "Computed capability flags for the company. Applies to both the company-level e_invoice_serial/e_archive_serial fields above and the same fields on each of the company's integrations, since configurability depends solely on the company's accounting provider.",
+            "properties": {
+              "e_invoice_serial_configurable": {
+                "type": "boolean",
+                "description": "Whether the accounting provider allows configuring a custom e_invoice_serial (currently QNB, Isnet, TrendyolEFaturam, ELogo, UyumsoftEInvoice, HepsiburadaEFaturam)."
+              },
+              "e_archive_serial_configurable": {
+                "type": "boolean",
+                "description": "Whether the accounting provider allows configuring a custom e_archive_serial (currently QNB, Isnet, TrendyolEFaturam, Mikro, ELogo, UyumsoftEInvoice, HepsiburadaEFaturam)."
+              }
+            }
+          },
+          "e_invoice_credit": {
+            "type": "integer"
+          },
+          "e_invoice_provider": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_invoicing_activated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "e_archiving_activated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "role": {
+            "type": "string"
+          }
+        }
+      },
+      "Address": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "district": {
+            "type": "string"
+          },
+          "postal_code": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductCreateRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "barcode",
+          "stock_code",
+          "price",
+          "market_price",
+          "type",
+          "is_active"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "barcode": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "stock_code": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "price": {
+            "type": "number"
+          },
+          "market_price": {
+            "type": "number"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "main",
+              "basic",
+              "variant",
+              "expense"
+            ]
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "tax_rate": {
+            "type": "number",
+            "enum": [
+              0,
+              1,
+              10,
+              20
+            ],
+            "nullable": true
+          },
+          "product_category_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "fulfillment_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "quantity": {
+            "type": "integer",
+            "nullable": true
+          },
+          "weight": {
+            "type": "number",
+            "nullable": true
+          },
+          "hs_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "shipment_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ProductResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "main",
+              "basic",
+              "variant",
+              "expense"
+            ]
+          },
+          "price": {
+            "type": "number",
+            "format": "float"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "barcode": {
+            "type": "string",
+            "nullable": true
+          },
+          "weight": {
+            "type": "number",
+            "nullable": true
+          },
+          "hs_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "variant": {
+            "type": "object",
+            "nullable": true
+          },
+          "tax_rate": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              10,
+              20
+            ]
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "deleted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "child_count": {
+            "type": "integer"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "stock_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "catalog": {
+            "type": "object",
+            "nullable": true
+          },
+          "warehouse_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "market_price": {
+            "type": "number",
+            "nullable": true
+          },
+          "shipment_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "fulfillment_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "parent_product_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "product_category_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "integration_product_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "source_integration_id": {
+            "type": "integer",
+            "nullable": true
+          }
+        }
+      },
+      "ProductJobResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "job": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job_readable": {
+            "type": "string"
+          },
+          "integration_id": {
+            "type": "integer"
+          },
+          "status_readable": {
+            "type": "string"
+          },
+          "retryable": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "OrderResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "order_id": {
+            "type": "string"
+          },
+          "order_id2": {
+            "type": "string",
+            "nullable": true
+          },
+          "group_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
+          },
+          "status_readable": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "e_invoice_status": {
+            "type": "string"
+          },
+          "e_invoice_document_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "invoice_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_invoice_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "discount_amount": {
+            "type": "number"
+          },
+          "last_error": {
+            "type": "string",
+            "nullable": true
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "push_ready": {
+            "type": "boolean"
+          },
+          "einvoice_created_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "pushed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "order_created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "final_amount": {
+            "type": "number"
+          },
+          "is_printed": {
+            "type": "boolean"
+          },
+          "customer_info": {
+            "type": "object"
+          },
+          "payment_method": {
+            "type": "string",
+            "nullable": true
+          },
+          "payment_method_readable": {
+            "type": "string",
+            "nullable": true
+          },
+          "payment_provider": {
+            "type": "string",
+            "nullable": true
+          },
+          "cargo_company_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "cargo_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "cargo_tracking_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "cargo_tracking_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "has_shipping": {
+            "type": "boolean"
+          },
+          "integration_id": {
+            "type": "integer"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "sale",
+              "return",
+              "cancel"
+            ]
+          },
+          "archived_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "issue_date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "due_date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "fulfillment_status": {
+            "type": "string",
+            "nullable": true
+          },
+          "exchange_rate": {
+            "type": "number",
+            "nullable": true
+          },
+          "paid_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "OrderCreateRequest": {
+        "type": "object",
+        "required": [
+          "customer_id",
+          "final_amount",
+          "e_invoice_status",
+          "description",
+          "currency",
+          "items"
+        ],
+        "properties": {
+          "customer_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "final_amount": {
+            "type": "number"
+          },
+          "e_invoice_status": {
+            "type": "string"
+          },
+          "has_shipping": {
+            "type": "boolean"
+          },
+          "payment_method": {
+            "type": "string",
+            "nullable": true
+          },
+          "payment_provider": {
+            "type": "string",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "order_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "product_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "integration_product_id": {
+                  "type": "integer",
+                  "nullable": true
+                },
+                "price": {
+                  "type": "number"
+                },
+                "quantity": {
+                  "type": "integer"
+                },
+                "discount": {
+                  "type": "number"
+                },
+                "tax_rate": {
+                  "type": "number"
+                },
+                "variants": {
+                  "type": "object",
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "tag_ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "shipping": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "country": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string"
+              },
+              "district": {
+                "type": "string"
+              },
+              "address": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "surname": {
+                "type": "string"
+              },
+              "contact_number": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              }
+            }
+          },
+          "same_as_billing": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "invoice_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "due_date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "order_created_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "issue_date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          }
+        }
+      },
+      "OrderShippingResponse": {
+        "type": "object",
+        "description": "Order shipping information for shippable orders."
+      },
+      "PaymentResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "order_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "description": {
+            "type": "string"
+          },
+          "exchange_rate": {
+            "type": "number"
+          }
+        }
+      },
+      "BulkIdsRequest": {
+        "type": "object",
+        "required": [
+          "ids"
+        ],
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "OrdersEInvoiceRequest": {
+        "type": "object",
+        "required": [
+          "order_ids"
+        ],
+        "properties": {
+          "order_ids": {
+            "type": "array",
+            "description": "Numeric ids of the orders to generate e-invoices for.",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "e_invoice_scenario": {
+            "type": "string",
+            "description": "E-invoice scenario (basic or commercial).",
+            "enum": [
+              "basic",
+              "commercial"
+            ]
+          }
+        }
+      },
+      "IntegrationResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "marketplace": {
+            "type": "string"
+          },
+          "marketplace_readable": {
+            "type": "string"
+          },
+          "subscription_id": {
+            "type": "integer"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "config_completed": {
+            "type": "boolean"
+          },
+          "config": {
+            "type": "object"
+          },
+          "options": {
+            "type": "object"
+          },
+          "domain": {
+            "type": "string",
+            "nullable": true
+          },
+          "website_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "contact_email": {
+            "type": "string",
+            "nullable": true
+          },
+          "cc_email": {
+            "type": "string",
+            "nullable": true
+          },
+          "summary_active": {
+            "type": "boolean"
+          },
+          "e_invoice_active": {
+            "type": "boolean"
+          },
+          "e_invoice_scenario": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_invoice_serial": {
+            "type": "string",
+            "nullable": true,
+            "description": "Custom e-invoice serial prefix. Only accepted when the company's accounting provider supports it (currently QNB, Isnet, TrendyolEFaturam, ELogo, UyumsoftEInvoice, HepsiburadaEFaturam)."
+          },
+          "e_archive_serial": {
+            "type": "string",
+            "nullable": true,
+            "description": "Custom e-archive serial prefix. Only accepted when the company's accounting provider supports it (currently QNB, Isnet, TrendyolEFaturam, Mikro, ELogo, UyumsoftEInvoice, HepsiburadaEFaturam). Whether these fields are configurable is exposed on the owning company's `abilities` (see `CompanyResponse`), not per integration, since it depends solely on the company's accounting provider."
+          },
+          "cargo_company_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "make_paid": {
+            "type": "boolean"
+          },
+          "tax_rate": {
+            "type": "number"
+          },
+          "send_invoice_mail": {
+            "type": "boolean"
+          },
+          "invoice_note": {
+            "type": "string",
+            "nullable": true
+          },
+          "email_note": {
+            "type": "string",
+            "nullable": true
+          },
+          "last_error": {
+            "type": "string",
+            "nullable": true
+          },
+          "deleted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "parent_integration_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "use_export_invoice": {
+            "type": "boolean"
+          }
+        }
+      },
+      "IntegrationProductResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "url": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "weight": {
+            "type": "number",
+            "nullable": true
+          },
+          "barcode": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "sync_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "on_sale": {
+            "type": "boolean"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "tax_rate": {
+            "type": "number"
+          },
+          "stock_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "child_count": {
+            "type": "integer"
+          },
+          "market_price": {
+            "type": "number",
+            "nullable": true
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "integration_id": {
+            "type": "integer"
+          },
+          "marketplace_id": {
+            "type": "string"
+          },
+          "marketplace_name": {
+            "type": "string"
+          },
+          "properties": {
+            "type": "object",
+            "nullable": true
+          },
+          "use_product_name": {
+            "type": "boolean"
+          },
+          "use_product_price": {
+            "type": "boolean"
+          },
+          "product_synced_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "IntegrationProductCategoryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "is_deep": {
+            "type": "boolean"
+          },
+          "parent_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "integration_id": {
+            "type": "integer"
+          },
+          "full_path": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "IntegrationProductPropertyResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "string",
+              "numeric",
+              "boolean",
+              "enum",
+              "array",
+              "strings"
+            ]
+          },
+          "property_id": {
+            "type": "string"
+          },
+          "is_customization": {
+            "type": "boolean"
+          },
+          "has_max": {
+            "type": "boolean"
+          },
+          "is_updatable": {
+            "type": "boolean"
+          },
+          "options": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "IntegrationWarehouseResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "integration_id": {
+            "type": "integer"
+          },
+          "integration_warehouse_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "warehouse_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CustomerResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "customer_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "Customer",
+              "Company"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "invoice_address": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "district": {
+            "type": "string",
+            "nullable": true
+          },
+          "tc": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "tax_number": {
+            "type": "string",
+            "nullable": true
+          },
+          "tax_office": {
+            "type": "string",
+            "nullable": true
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "nullable": true
+          },
+          "country_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "postal_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "integration_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "archived_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "is_vendor": {
+            "type": "boolean"
+          },
+          "balance": {
+            "type": "object",
+            "nullable": true
+          }
+        }
+      },
+      "CustomerCreateRequest": {
+        "type": "object",
+        "required": [
+          "type",
+          "name"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "Customer",
+              "Company"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 3
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "district": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "nullable": true
+          },
+          "tc": {
+            "type": "string",
+            "nullable": true
+          },
+          "tax_number": {
+            "type": "string",
+            "nullable": true
+          },
+          "tax_office": {
+            "type": "string",
+            "nullable": true
+          },
+          "invoice_address": {
+            "type": "string",
+            "nullable": true
+          },
+          "postal_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "is_vendor": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SubscriptionResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "price": {
+            "type": "number"
+          },
+          "channel": {
+            "type": "string"
+          },
+          "promotion": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "renewal_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deleted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "is_expired": {
+            "type": "boolean"
+          },
+          "renew_month": {
+            "type": "integer"
+          },
+          "package_count": {
+            "type": "integer"
+          },
+          "payment_method": {
+            "type": "string"
+          },
+          "integration_count": {
+            "type": "integer"
+          }
+        }
+      },
+      "SubscriptionCreateRequest": {
+        "type": "object",
+        "required": [
+          "package_id",
+          "renew_month"
+        ],
+        "properties": {
+          "package_id": {
+            "type": "integer"
+          },
+          "renew_month": {
+            "type": "integer"
+          },
+          "promotion_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "payment_method": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "credit-card",
+              "partnership"
+            ]
+          },
+          "card": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "number": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "year": {
+                "type": "string"
+              },
+              "month": {
+                "type": "string"
+              },
+              "cvc": {
+                "type": "string"
+              }
+            }
+          },
+          "billing": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "address": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string"
+              },
+              "district": {
+                "type": "string"
+              },
+              "country": {
+                "type": "string"
+              },
+              "tax_office": {
+                "type": "string"
+              },
+              "tax_number": {
+                "type": "string"
+              },
+              "postal_code": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "TaskResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "completed",
+              "failed"
+            ]
+          },
+          "progress": {
+            "type": "number"
+          },
+          "result": {
+            "type": "object",
+            "nullable": true
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "WarehouseResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "object",
+            "nullable": true
+          },
+          "is_default": {
+            "type": "boolean"
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "AccountTransactionResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "XmlResourceResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "InvoiceResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "package_name": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "amount_readable": {
+            "type": "string"
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "paid_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "e_invoice_status": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_invoice_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "PackageResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "code": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "sort": {
+            "type": "integer"
+          },
+          "price": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "country": {
+            "type": "string"
+          },
+          "prices": {
+            "type": "object"
+          },
+          "name_en": {
+            "type": "string"
+          },
+          "name_tr": {
+            "type": "string"
+          },
+          "unlimited": {
+            "type": "boolean"
+          },
+          "marketplaces": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/v2.0/company/{companyId}/product": {
+      "post": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "Create product",
+        "description": "> **Required scope:** any API-App key\n\nCreate a new product.",
+        "operationId": "createProduct",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Product"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "Bulk update products",
+        "description": "> **Required scope:** any API-App key\n\nUpdates multiple products at once.",
+        "operationId": "bulkUpdateProducts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "description": "Array of product UUIDs to update"
+                  }
+                },
+                "required": [
+                  "ids"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Products updated successfully"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "Bulk delete products",
+        "description": "> **Required scope:** any API-App key\n\nDeletes multiple products at once.",
+        "operationId": "bulkDeleteProducts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "description": "Array of product UUIDs to delete"
+                  }
+                },
+                "required": [
+                  "ids"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Products deleted successfully"
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/product/status": {
+      "get": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "Product status counts",
+        "description": "> **Required scope:** any API-App key\n\nReturns counts of products grouped by status.",
+        "operationId": "getProductStatusCounts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status counts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/product/restore": {
+      "post": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "Bulk restore products",
+        "description": "> **Required scope:** any API-App key\n\nRestores multiple previously deleted products.",
+        "operationId": "bulkRestoreProducts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "description": "Array of product UUIDs to restore"
+                  }
+                },
+                "required": [
+                  "ids"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Products restored successfully"
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/product/{productId}": {
+      "get": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "Get product",
+        "description": "> **Required scope:** any API-App key\n\nReturns a single product by ID.",
+        "operationId": "getProduct",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/productId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "Update product",
+        "description": "> **Required scope:** any API-App key\n\nUpdates a single product.",
+        "operationId": "updateProduct",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/productId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "main",
+                      "basic",
+                      "variant",
+                      "expense"
+                    ]
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "tax_rate": {
+                    "type": "number",
+                    "nullable": true,
+                    "enum": [
+                      0,
+                      1,
+                      10,
+                      20
+                    ]
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  },
+                  "product_category_id": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "fulfillment_id": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "price": {
+                    "type": "number"
+                  },
+                  "market_price": {
+                    "type": "number"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "barcode": {
+                    "type": "string"
+                  },
+                  "stock_code": {
+                    "type": "string"
+                  },
+                  "weight": {
+                    "type": "number"
+                  },
+                  "hs_code": {
+                    "type": "string"
+                  },
+                  "shipment_name": {
+                    "type": "string"
+                  },
+                  "variant": {
+                    "type": "object",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "type",
+                  "is_active"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/product/{productId}/image": {
+      "get": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "Get product images",
+        "description": "> **Required scope:** any API-App key\n\nReturns all images for a product.",
+        "operationId": "getProductImages",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/productId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of product images",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "sort": {
+                            "type": "integer"
+                          },
+                          "integration_image_ids": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "Update product images",
+        "description": "> **Required scope:** any API-App key\n\nUpdates the images for a product.",
+        "operationId": "updateProductImages",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/productId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "images": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "url": {
+                          "type": "string"
+                        },
+                        "sort": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "url",
+                        "sort"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "images"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Images updated successfully"
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/product/{productId}/stock": {
+      "get": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "List stock events",
+        "description": "> **Required scope:** any API-App key\n\nReturns a paginated list of stock events for a product.",
+        "operationId": "listStockEvents",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/productId"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Number of items per page"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Sort field, prefix with - for desc (e.g. -created_at)"
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated relations to include"
+          },
+          {
+            "name": "with_trashed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Include soft-deleted items"
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Include archived items"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of stock events",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "quantity": {
+                            "type": "integer"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "Create stock event",
+        "description": "> **Required scope:** any API-App key\n\nCreates a new stock event for a product. Prefix quantity with '=' for absolute value.",
+        "operationId": "createStockEvent",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/productId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "quantity": {
+                    "type": "integer",
+                    "description": "Stock quantity change. Prefix with '=' for absolute value (e.g. '=10' sets stock to 10)."
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "quantity"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Stock event created"
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/orders": {
+      "get": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "List orders",
+        "description": "> **Required scope:** any API-App key\n\nRetrieve a paginated list of orders using cursor pagination.",
+        "operationId": "listOrders",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            },
+            "description": "Number of results per page."
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Sort field. Prefix with - for descending order."
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated relations to include (e.g., orderPackages,customer,shipping,orderItems)."
+          },
+          {
+            "name": "with_trashed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Include soft-deleted orders."
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Include archived orders."
+          },
+          {
+            "name": "integration_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by integration."
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "sale",
+                "return",
+                "cancel"
+              ]
+            },
+            "description": "Filter by order type."
+          },
+          {
+            "name": "statuses",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated order statuses to filter by."
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search across multiple fields."
+          },
+          {
+            "name": "order_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by specific order ID."
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Filter orders created on or after this date."
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Filter orders created on or before this date."
+          },
+          {
+            "name": "start_order_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Order ID range start."
+          },
+          {
+            "name": "end_order_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Order ID range end."
+          },
+          {
+            "name": "customer_name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by customer name."
+          },
+          {
+            "name": "cargo_code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by cargo code."
+          },
+          {
+            "name": "cargo_tracking_code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by cargo tracking code."
+          },
+          {
+            "name": "order_package_code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by order package code."
+          },
+          {
+            "name": "has_cargo_code",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter orders that have a cargo code."
+          },
+          {
+            "name": "has_cargo_tracking_code",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter orders that have a cargo tracking code."
+          },
+          {
+            "name": "is_cargo_code_cancelled",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter orders whose cargo code was cancelled (shipment_status = cancelled), as opposed to orders that never had one."
+          },
+          {
+            "name": "cargo_company",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by cargo company ID."
+          },
+          {
+            "name": "shipment_country_code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by shipment country code."
+          },
+          {
+            "name": "shipment_status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by shipment status."
+          },
+          {
+            "name": "is_printed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter by print status."
+          },
+          {
+            "name": "print_start_date",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Filter by print date range start."
+          },
+          {
+            "name": "print_end_date",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Filter by print date range end."
+          },
+          {
+            "name": "edit_needed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter orders that need editing."
+          },
+          {
+            "name": "is_pushed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter by pushed to accounting status."
+          },
+          {
+            "name": "push_start_at",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Filter by push date range start."
+          },
+          {
+            "name": "push_end_at",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Filter by push date range end."
+          },
+          {
+            "name": "is_invoiced",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter orders that have an e-invoice."
+          },
+          {
+            "name": "only_zero_tax",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter only zero tax orders."
+          },
+          {
+            "name": "order_pushable",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter orders that are ready to push."
+          },
+          {
+            "name": "is_sale",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter sale orders."
+          },
+          {
+            "name": "is_expense",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter expense orders."
+          },
+          {
+            "name": "integration_product_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by integration product ID."
+          },
+          {
+            "name": "integration_product_ids",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated integration product IDs."
+          },
+          {
+            "name": "product_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Filter by product ID."
+          },
+          {
+            "name": "product_ids",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated product UUIDs."
+          },
+          {
+            "name": "tag_ids",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated tag IDs."
+          },
+          {
+            "name": "payment_method",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by payment method."
+          },
+          {
+            "name": "e_invoice_status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by e-invoice status."
+          },
+          {
+            "name": "push_ready",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter by push-ready flag."
+          },
+          {
+            "name": "has_shipping",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter by shipping availability."
+          },
+          {
+            "name": "currency",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by currency code."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of orders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/OrderResponse"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Create order",
+        "description": "> **Required scope:** any API-App key\n\nCreate a new order.",
+        "operationId": "createOrder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Order created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OrderResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Bulk update orders",
+        "description": "> **Required scope:** any API-App key\n\nUpdate multiple orders at once.",
+        "operationId": "bulkUpdateOrders",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ids"
+                ],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  },
+                  "fields": {
+                    "type": "object",
+                    "description": "Fields to update on each order."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Orders updated successfully."
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/orders/{orderId}": {
+      "get": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Get order",
+        "description": "> **Required scope:** any API-App key\n\nRetrieve a single order by its identifier.",
+        "operationId": "getOrder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/orderId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OrderResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Update order",
+        "description": "> **Required scope:** any API-App key\n\nUpdate an existing order.",
+        "operationId": "updateOrder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/orderId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Order updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OrderResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Delete order",
+        "description": "> **Required scope:** any API-App key\n\nDelete a single order.",
+        "operationId": "deleteOrder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/orderId"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Order deleted successfully."
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/orders/{orderId}/cancel": {
+      "delete": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Cancel single order",
+        "description": "> **Required scope:** any API-App key\n\nCancel a single order.",
+        "operationId": "cancelOrder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/orderId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order cancelled successfully."
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/orders/{orderId}/pull": {
+      "get": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Pull order from integration",
+        "description": "> **Required scope:** any API-App key\n\nPull the latest order data from the connected integration.",
+        "operationId": "pullOrder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/orderId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order pulled successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OrderResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/orders/push": {
+      "post": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Push orders to accounting",
+        "description": "> **Required scope:** any API-App key\n\nPush one or more orders to the connected accounting integration.",
+        "operationId": "pushOrders",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkIdsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Orders pushed successfully."
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/orders/e-invoice": {
+      "post": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Generate e-invoice",
+        "description": "> **Required scope:** any API-App key\n\nGenerate e-invoices for the specified orders.",
+        "operationId": "generateEInvoice",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrdersEInvoiceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "E-invoices generated successfully."
+          }
+        }
+      }
+    },
+    "/v1.0/company/{companyId}/integration/{integrationId}/shipping": {
+      "get": {
+        "tags": [
+          "Order Shipping"
+        ],
+        "summary": "List shippable orders",
+        "description": "> **Required scope:** `order:read`\n\nRetrieve a paginated list of orders ready for shipping.",
+        "operationId": "listShippableOrders",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Number of results per page."
+          },
+          {
+            "name": "ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Filter by order identifiers."
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Field to sort results by."
+          },
+          {
+            "name": "is_printed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter by print status."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of shippable orders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/OrderShippingResponse"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1.0/company/{companyId}/integration/{integrationId}/shipping-slip": {
+      "get": {
+        "tags": [
+          "Order Shipping"
+        ],
+        "summary": "Print shipping slips for orders",
+        "description": "> **Required scope:** `order:read`\n\nCreates a background task that generates shipping slip PDFs.\nAlways use mode=task to get a JSON task response.\n",
+        "operationId": "generateShippingSlip",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          },
+          {
+            "name": "ids",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Order numeric IDs (the \"id\" field, NOT \"order_id\")"
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "task"
+              ]
+            },
+            "description": "Must be \"task\" to create a background task"
+          },
+          {
+            "name": "with",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "invoice",
+                  "slip"
+                ]
+              }
+            },
+            "description": "Documents to include. Use 'slip' for shipping slip, 'invoice' for e-invoice, or both"
+          },
+          {
+            "name": "is_portrait",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Use portrait orientation"
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Sort orders by product"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task created for generating shipping slips",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Task details"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/integration/{integrationId}/order/{orderId}/shipping": {
+      "put": {
+        "tags": [
+          "Order Shipping"
+        ],
+        "summary": "Update shipping",
+        "description": "> **Required scope:** any API-App key\n\nUpdate shipping information for an order within an integration.",
+        "operationId": "updateShipping",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          },
+          {
+            "$ref": "#/components/parameters/orderId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "address": {
+                    "type": "object",
+                    "description": "Shipping address details."
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "cargo_integration": {
+                    "type": "object",
+                    "description": "Cargo integration configuration."
+                  },
+                  "payment_info": {
+                    "type": "object",
+                    "description": "Payment information."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Shipping updated successfully."
+          }
+        }
+      }
+    },
+    "/v1.0/company/{companyId}/integration/{integrationId}/product": {
+      "get": {
+        "tags": [
+          "Integration Product"
+        ],
+        "summary": "List integration products",
+        "operationId": "listIntegrationProducts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Search in name, stock_code, barcode, marketplace_product_id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "suggest",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "description": "Relations to include.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "with_recommend",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "importable",
+            "in": "query",
+            "description": "Filter importable products.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "accounting_id",
+            "in": "query",
+            "description": "Filter by accounting ID (handles null).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tax_rate",
+            "in": "query",
+            "description": "Filter by tax rate.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "ids",
+            "in": "query",
+            "description": "Comma-separated IDs.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort field.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of integration products.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/IntegrationProductResponse"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "pagination": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** `integration-product:read`"
+      },
+      "put": {
+        "tags": [
+          "Integration Product"
+        ],
+        "summary": "Bulk update integration products",
+        "operationId": "bulkUpdateIntegrationProducts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "accounting_id": {
+                    "type": "string"
+                  },
+                  "tax_rate": {
+                    "type": "number"
+                  },
+                  "hs_code": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Products updated."
+          }
+        },
+        "description": "> **Required scope:** `integration-product:update`"
+      }
+    },
+    "/v2.0/company/{companyId}/integration/{integrationId}/product/{integrationProductId}": {
+      "get": {
+        "tags": [
+          "Integration Product"
+        ],
+        "summary": "Get a single integration product",
+        "operationId": "getIntegrationProduct",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          },
+          {
+            "name": "integrationProductId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Integration product details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/IntegrationProductResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      },
+      "put": {
+        "tags": [
+          "Integration Product"
+        ],
+        "summary": "Update a single integration product",
+        "operationId": "updateIntegrationProduct",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          },
+          {
+            "name": "integrationProductId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "product_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "accounting_id": {
+                    "type": "string"
+                  },
+                  "tax_rate": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Integration product updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/IntegrationProductResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/integration/{integrationId}/product-category": {
+      "get": {
+        "tags": [
+          "Integration Category"
+        ],
+        "summary": "List integration product categories",
+        "operationId": "listIntegrationCategories",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "with_child",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Search in name.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "used_by",
+            "in": "query",
+            "description": "Filter by integration ID.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Filter by category ID.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Filter by category name.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "parent_id",
+            "in": "query",
+            "description": "Filter by parent category ID.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "is_deep",
+            "in": "query",
+            "description": "Filter by deep category status.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "full_path",
+            "in": "query",
+            "description": "Filter by full path.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort field.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of categories.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/IntegrationProductCategoryResponse"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "pagination": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/integration/{integrationId}/property": {
+      "get": {
+        "tags": [
+          "Integration Property"
+        ],
+        "summary": "List integration properties",
+        "operationId": "listIntegrationProperties",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "product_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "product_type",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of integration properties.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/IntegrationProductPropertyResponse"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/integration/{integrationId}/warehouses": {
+      "get": {
+        "tags": [
+          "Integration Warehouse"
+        ],
+        "summary": "List integration warehouses",
+        "operationId": "listIntegrationWarehouses",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of integration warehouses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/IntegrationWarehouseResponse"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/integration/{integrationId}/statuses": {
+      "get": {
+        "tags": [
+          "Integration"
+        ],
+        "summary": "Get integration statuses",
+        "operationId": "getIntegrationStatuses",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of statuses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/integration/{integrationId}/inventory": {
+      "get": {
+        "tags": [
+          "Integration"
+        ],
+        "summary": "Get integration inventory",
+        "operationId": "getIntegrationInventory",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Inventory data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/customers": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "List customers",
+        "description": "> **Required scope:** any API-App key\n\nReturns a cursor-paginated list of customers.",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Search in name, phone, email, tc, tax_number",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "is_vendor",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "tag_ids",
+            "in": "query",
+            "description": "Comma-separated tag IDs",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "balance",
+            "in": "query",
+            "description": "Operator-based filter (e.g., balance>=100, balance>0)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "with_trashed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated array of customers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CustomerResponse"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Create a customer",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Customer created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      },
+      "put": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Bulk update customers (tags)",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "tag_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Customers updated"
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/customer/{customerId}/payment": {
+      "post": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Create a payment for customer",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "amount"
+                ],
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "account_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Payment created"
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/customer/{customerId}/payments": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "List customer payments",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of payments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/reports/expense-amount": {
+      "get": {
+        "tags": [
+          "Report"
+        ],
+        "summary": "Get total expenses",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "integration_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total expense amount",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/reports/income-amount": {
+      "get": {
+        "tags": [
+          "Report"
+        ],
+        "summary": "Get total income",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "integration_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total income amount",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/reports/sale-count": {
+      "get": {
+        "tags": [
+          "Report"
+        ],
+        "summary": "Get sale count",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "integration_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sale count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/reports/income": {
+      "get": {
+        "tags": [
+          "Report"
+        ],
+        "summary": "Get income by period",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "integration_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Income by period",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "date": {
+                        "type": "string"
+                      },
+                      "amount": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/reports/expense": {
+      "get": {
+        "tags": [
+          "Report"
+        ],
+        "summary": "Get expenses by period",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "integration_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Expenses by period",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "date": {
+                        "type": "string"
+                      },
+                      "amount": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/reports/product": {
+      "get": {
+        "tags": [
+          "Report"
+        ],
+        "summary": "Get product sales report",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "integration_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product sales",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "product_id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "quantity": {
+                            "type": "integer"
+                          },
+                          "amount": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/reports/integration-product": {
+      "get": {
+        "tags": [
+          "Report"
+        ],
+        "summary": "Get integration product sales report",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "integration_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Integration product sales",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/reports/integration": {
+      "get": {
+        "tags": [
+          "Report"
+        ],
+        "summary": "Get sales by integration",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "integration_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sales by integration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "integration_id": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "amount": {
+                        "type": "number"
+                      },
+                      "count": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/reports/product-category": {
+      "get": {
+        "tags": [
+          "Report"
+        ],
+        "summary": "Get sales by product category",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "integration_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sales by category",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/reports/integration-product-category": {
+      "get": {
+        "tags": [
+          "Report"
+        ],
+        "summary": "Get sales by integration product category",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "integration_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sales by integration category",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/tags": {
+      "get": {
+        "tags": [
+          "Tag"
+        ],
+        "summary": "List tags",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "order",
+                "customer",
+                "product"
+              ]
+            }
+          },
+          {
+            "name": "ids",
+            "in": "query",
+            "description": "Comma-separated tag IDs",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of tags",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/tag": {
+      "post": {
+        "tags": [
+          "Tag"
+        ],
+        "summary": "Create a tag",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "type"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "order",
+                      "customer",
+                      "product"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tag created"
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/tag/{tagId}": {
+      "get": {
+        "tags": [
+          "Tag"
+        ],
+        "summary": "Get a tag",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "tagId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tag details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      },
+      "put": {
+        "tags": [
+          "Tag"
+        ],
+        "summary": "Update a tag",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "tagId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "order",
+                      "customer",
+                      "product"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tag updated"
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      },
+      "delete": {
+        "tags": [
+          "Tag"
+        ],
+        "summary": "Delete a tag",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "tagId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Tag deleted"
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/warehouse": {
+      "get": {
+        "tags": [
+          "Warehouse"
+        ],
+        "summary": "List warehouses",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of warehouses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WarehouseResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      },
+      "post": {
+        "tags": [
+          "Warehouse"
+        ],
+        "summary": "Create a warehouse",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "is_default": {
+                    "type": "boolean"
+                  },
+                  "accounting_id": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "address": {
+                    "type": "object",
+                    "nullable": true
+                  },
+                  "phone": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Warehouse created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarehouseResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/warehouse/{warehouseId}": {
+      "get": {
+        "tags": [
+          "Warehouse"
+        ],
+        "summary": "Get a warehouse",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "warehouseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Warehouse details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarehouseResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      },
+      "put": {
+        "tags": [
+          "Warehouse"
+        ],
+        "summary": "Update a warehouse",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "warehouseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "is_default": {
+                    "type": "boolean"
+                  },
+                  "accounting_id": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "address": {
+                    "type": "object",
+                    "nullable": true
+                  },
+                  "phone": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Warehouse updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarehouseResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/product-category": {
+      "get": {
+        "tags": [
+          "Product Category"
+        ],
+        "summary": "List product categories",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Search in name",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "synced_with",
+            "in": "query",
+            "description": "Integration ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "not_synced_with",
+            "in": "query",
+            "description": "Integration ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "has_properties_with",
+            "in": "query",
+            "description": "Integration ID with properties",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "havent_properties_with",
+            "in": "query",
+            "description": "Integration ID without properties",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated array of product categories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "note": {
+                            "type": "string",
+                            "nullable": true
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      },
+      "post": {
+        "tags": [
+          "Product Category"
+        ],
+        "summary": "Create a product category",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "note": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Product category created"
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      },
+      "delete": {
+        "tags": [
+          "Product Category"
+        ],
+        "summary": "Bulk delete product categories",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Categories deleted"
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    },
+    "/v2.0/company/{companyId}/product-category/{categoryId}": {
+      "get": {
+        "tags": [
+          "Product Category"
+        ],
+        "summary": "Get a product category",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "categoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "note": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      },
+      "put": {
+        "tags": [
+          "Product Category"
+        ],
+        "summary": "Update a product category",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "categoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "note": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Category updated"
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      },
+      "delete": {
+        "tags": [
+          "Product Category"
+        ],
+        "summary": "Delete a product category",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "categoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Category deleted"
+          }
+        },
+        "description": "> **Required scope:** any API-App key"
+      }
+    }
+  }
+}

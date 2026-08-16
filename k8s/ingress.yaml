@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: yengec-developer-hub
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: developers.yengec.co
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: yengec-developer-hub
+                port:
+                  number: 80

@@ -1,0 +1,7150 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Yengeç Geliştirici API",
+    "description": "Yengeç API App ile firmanızın ürün, sipariş ve stok işlemlerini programatik yönetin.\n\n## Kimlik doğrulama\nÇoğu uç nokta `POST /v2.0/auth/token` ile alınan bir Bearer token gerektirir:\n```\nAuthorization: Bearer <access_token>\n```\nHer uç noktanın gerektirdiği kapsam (scope) açıklamasında belirtilmiştir.\n\n## Sayfalama\nOffset: `?page=N&limit=N`. Cursor: `?limit=N&cursor=...`.\n\n## Yanıt zarfı\nTekil kayıt `{ \"data\": { ... } }`; listelerde `meta.pagination` eklenir.\n\n## Temel URL\nÜretim: `https://api.yengec.co` · Test: `https://api-test.yengec.co`",
+    "version": "2.0.0",
+    "contact": {
+      "name": "Yengec Support",
+      "url": "https://yengec.co"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.yengec.co",
+      "description": "Production"
+    },
+    {
+      "url": "https://api-test.yengec.co",
+      "description": "Staging"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication"
+    },
+    {
+      "name": "User"
+    },
+    {
+      "name": "Credit Card"
+    },
+    {
+      "name": "Company"
+    },
+    {
+      "name": "Ürün"
+    },
+    {
+      "name": "Sipariş"
+    },
+    {
+      "name": "Sipariş Kargo"
+    },
+    {
+      "name": "Entegrasyon"
+    },
+    {
+      "name": "Entegrasyon Ürünü"
+    },
+    {
+      "name": "Entegrasyon Kategorisi"
+    },
+    {
+      "name": "Entegrasyon Özelliği"
+    },
+    {
+      "name": "Entegrasyon Deposu"
+    },
+    {
+      "name": "Müşteri"
+    },
+    {
+      "name": "Subscription"
+    },
+    {
+      "name": "Rapor"
+    },
+    {
+      "name": "Etiket"
+    },
+    {
+      "name": "Task"
+    },
+    {
+      "name": "Depo"
+    },
+    {
+      "name": "Account"
+    },
+    {
+      "name": "Ürün Kategorisi"
+    },
+    {
+      "name": "XML Resource"
+    },
+    {
+      "name": "Invoice"
+    },
+    {
+      "name": "Question"
+    },
+    {
+      "name": "Credit"
+    },
+    {
+      "name": "Purchase"
+    },
+    {
+      "name": "E-Invoice"
+    },
+    {
+      "name": "Global"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": [],
+      "apiKeyClientId": [],
+      "apiKeyClientSecret": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "apiKeyClientId": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "client-id",
+        "description": "OAuth client ID from Passport"
+      },
+      "apiKeyClientSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "client-secret",
+        "description": "OAuth client secret from Passport"
+      }
+    },
+    "parameters": {
+      "companyId": {
+        "name": "companyId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "Firmanın ID'si."
+      },
+      "integrationId": {
+        "name": "integrationId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        },
+        "description": "Entegrasyonun ID'si."
+      },
+      "limit": {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "description": "Sayfa başına öğe sayısı",
+        "schema": {
+          "type": "integer",
+          "default": 20
+        }
+      },
+      "page": {
+        "name": "page",
+        "in": "query",
+        "required": false,
+        "description": "Sayfa numarası (offset tabanlı sayfalama)",
+        "schema": {
+          "type": "integer",
+          "default": 1
+        }
+      },
+      "productId": {
+        "name": "productId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "Ürün UUID"
+      },
+      "productImportId": {
+        "name": "productImportId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        },
+        "description": "Ürün içe aktarma ID"
+      },
+      "jobId": {
+        "name": "jobId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "İş (job) ID"
+      },
+      "orderId": {
+        "name": "orderId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "Sipariş tanımlayıcısı."
+      },
+      "orderPackageId": {
+        "name": "orderPackageId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "Sipariş paketi tanımlayıcısı."
+      }
+    },
+    "schemas": {
+      "PaginationMeta": {
+        "type": "object",
+        "description": "Offset tabanlı sayfalama meta verisi (çoğu liste uç noktasında kullanılır)",
+        "properties": {
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer"
+              },
+              "count": {
+                "type": "integer"
+              },
+              "per_page": {
+                "type": "integer"
+              },
+              "current_page": {
+                "type": "integer"
+              },
+              "total_pages": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "CursorPaginationMeta": {
+        "type": "object",
+        "description": "Cursor tabanlı sayfalama meta verisi (bildirimler ve bazı uç noktalarda kullanılır)",
+        "properties": {
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "type": "integer"
+              },
+              "per_page": {
+                "type": "integer"
+              },
+              "next_cursor": {
+                "type": "string",
+                "nullable": true
+              },
+              "prev_cursor": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "mobile": {
+            "type": "string",
+            "nullable": true
+          },
+          "provider": {
+            "type": "string",
+            "nullable": true
+          },
+          "is_email_verified": {
+            "type": "boolean"
+          },
+          "is_mobile_verified": {
+            "type": "boolean"
+          },
+          "mobile_notification": {
+            "type": "boolean"
+          },
+          "permissions": {
+            "type": "object"
+          },
+          "channel": {
+            "type": "string"
+          },
+          "has_password": {
+            "type": "boolean"
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "tr",
+              "en"
+            ]
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "unread_notification_count": {
+            "type": "integer"
+          }
+        }
+      },
+      "Company": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "nullable": true
+          },
+          "channel": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "TRY",
+              "USD",
+              "EUR",
+              "GBP"
+            ]
+          },
+          "logo_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "settings": {
+            "type": "object",
+            "nullable": true
+          },
+          "district": {
+            "type": "string",
+            "nullable": true
+          },
+          "postal_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "tax_office": {
+            "type": "string",
+            "nullable": true
+          },
+          "tax_number": {
+            "type": "string"
+          },
+          "accounting": {
+            "type": "string",
+            "nullable": true
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "website_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "ioss": {
+            "type": "string",
+            "nullable": true
+          },
+          "voec": {
+            "type": "string",
+            "nullable": true
+          },
+          "pva": {
+            "type": "string",
+            "nullable": true
+          },
+          "mid": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_invoice_serial": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_archive_serial": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_invoice_credit": {
+            "type": "integer"
+          },
+          "e_invoice_provider": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_invoicing_activated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "e_archiving_activated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "main",
+              "basic",
+              "variant",
+              "expense"
+            ]
+          },
+          "price": {
+            "type": "number",
+            "format": "float"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "barcode": {
+            "type": "string",
+            "nullable": true
+          },
+          "weight": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "hs_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "variant": {
+            "type": "object",
+            "nullable": true
+          },
+          "tax_rate": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              10,
+              20
+            ]
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "deleted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "child_count": {
+            "type": "integer"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "stock_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "catalog": {
+            "type": "object",
+            "nullable": true,
+            "description": "null=kontrol edilmedi, {count:0}=eşleşme yok, {count:N,matches:[...]}=eşleşti"
+          },
+          "warehouse_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "market_price": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "shipment_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "fulfillment_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "parent_product_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "product_category_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "integration_product_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "source_integration_id": {
+            "type": "integer",
+            "nullable": true
+          }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "order_id": {
+            "type": "string"
+          },
+          "order_id2": {
+            "type": "string",
+            "nullable": true
+          },
+          "group_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
+          },
+          "status_readable": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_invoice_status": {
+            "type": "string"
+          },
+          "e_invoice_document_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "invoice_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_invoice_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "discount_amount": {
+            "type": "number",
+            "format": "float"
+          },
+          "last_error": {
+            "type": "string",
+            "nullable": true
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "push_ready": {
+            "type": "boolean"
+          },
+          "einvoice_created_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "pushed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "order_created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "final_amount": {
+            "type": "number",
+            "format": "float"
+          },
+          "is_printed": {
+            "type": "boolean"
+          },
+          "customer_info": {
+            "type": "object"
+          },
+          "payment_method": {
+            "type": "string",
+            "nullable": true
+          },
+          "payment_method_readable": {
+            "type": "string",
+            "nullable": true
+          },
+          "payment_provider": {
+            "type": "string",
+            "nullable": true
+          },
+          "cargo_company_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "cargo_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "cargo_tracking_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "cargo_tracking_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "has_shipping": {
+            "type": "boolean"
+          },
+          "integration_id": {
+            "type": "integer"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "sale",
+              "return",
+              "cancel"
+            ]
+          },
+          "archived_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "issue_date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "due_date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "fulfillment_status": {
+            "type": "string",
+            "nullable": true
+          },
+          "exchange_rate": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "paid_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "Integration": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "order",
+              "cargo",
+              "product",
+              "fulfillment"
+            ]
+          },
+          "marketplace": {
+            "type": "string"
+          },
+          "marketplace_readable": {
+            "type": "string"
+          },
+          "subscription_id": {
+            "type": "integer"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "config_completed": {
+            "type": "boolean"
+          },
+          "config": {
+            "type": "object"
+          },
+          "options": {
+            "type": "object"
+          },
+          "domain": {
+            "type": "string",
+            "nullable": true
+          },
+          "website_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "contact_email": {
+            "type": "string",
+            "nullable": true
+          },
+          "cc_email": {
+            "type": "string",
+            "nullable": true
+          },
+          "summary_active": {
+            "type": "boolean"
+          },
+          "e_invoice_active": {
+            "type": "boolean"
+          },
+          "e_invoice_scenario": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "basic",
+              "commercial"
+            ]
+          },
+          "cargo_company_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "make_paid": {
+            "type": "boolean"
+          },
+          "tax_rate": {
+            "type": "number"
+          },
+          "send_invoice_mail": {
+            "type": "boolean"
+          },
+          "invoice_note": {
+            "type": "string",
+            "nullable": true
+          },
+          "email_note": {
+            "type": "string",
+            "nullable": true
+          },
+          "last_error": {
+            "type": "string",
+            "nullable": true
+          },
+          "deleted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "parent_integration_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "use_export_invoice": {
+            "type": "boolean"
+          }
+        }
+      },
+      "IntegrationProduct": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "url": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number",
+            "format": "float"
+          },
+          "weight": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "barcode": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "sync_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "on_sale": {
+            "type": "boolean"
+          },
+          "quantity": {
+            "type": "number",
+            "format": "float"
+          },
+          "tax_rate": {
+            "type": "number",
+            "format": "float"
+          },
+          "stock_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "child_count": {
+            "type": "integer"
+          },
+          "market_price": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "integration_id": {
+            "type": "integer"
+          },
+          "marketplace_id": {
+            "type": "string"
+          },
+          "marketplace_name": {
+            "type": "string"
+          },
+          "properties": {
+            "type": "object",
+            "nullable": true
+          },
+          "use_product_name": {
+            "type": "boolean"
+          },
+          "use_product_price": {
+            "type": "boolean"
+          },
+          "product_synced_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "customer_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "Customer",
+              "Company"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "invoice_address": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "district": {
+            "type": "string",
+            "nullable": true
+          },
+          "tc": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "tax_number": {
+            "type": "string",
+            "nullable": true
+          },
+          "tax_office": {
+            "type": "string",
+            "nullable": true
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "nullable": true
+          },
+          "country_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "postal_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "integration_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "archived_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "is_vendor": {
+            "type": "boolean"
+          },
+          "balance": {
+            "type": "object",
+            "nullable": true
+          }
+        }
+      },
+      "Subscription": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "price": {
+            "type": "number",
+            "format": "float"
+          },
+          "channel": {
+            "type": "string"
+          },
+          "promotion": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "renewal_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deleted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "is_expired": {
+            "type": "boolean"
+          },
+          "renew_month": {
+            "type": "integer"
+          },
+          "package_count": {
+            "type": "integer"
+          },
+          "payment_method": {
+            "type": "string"
+          },
+          "integration_count": {
+            "type": "integer"
+          }
+        }
+      },
+      "Warehouse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "object",
+            "nullable": true
+          },
+          "is_default": {
+            "type": "boolean"
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "Account": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "account",
+              "bank"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "iban": {
+            "type": "string",
+            "nullable": true
+          },
+          "balance": {
+            "type": "number",
+            "format": "float"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "TRY",
+              "USD",
+              "EUR",
+              "GBP"
+            ]
+          },
+          "bank_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "balance_at": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "deleted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "type_readable": {
+            "type": "string"
+          },
+          "currency_symbol": {
+            "type": "string"
+          }
+        }
+      },
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "order",
+              "customer",
+              "product"
+            ]
+          }
+        }
+      },
+      "Task": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "completed",
+              "failed"
+            ]
+          },
+          "progress": {
+            "type": "number"
+          },
+          "result": {
+            "type": "object",
+            "nullable": true
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Package": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "code": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "sort": {
+            "type": "integer"
+          },
+          "price": {
+            "type": "number",
+            "format": "float"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "country": {
+            "type": "string"
+          },
+          "prices": {
+            "type": "object"
+          },
+          "name_en": {
+            "type": "string"
+          },
+          "name_tr": {
+            "type": "string"
+          },
+          "unlimited": {
+            "type": "boolean"
+          },
+          "marketplaces": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "status_code": {
+            "type": "integer"
+          },
+          "errors": {
+            "type": "object"
+          }
+        }
+      },
+      "AccountResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "account",
+              "bank"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "iban": {
+            "type": "string",
+            "nullable": true
+          },
+          "balance": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "bank_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "balance_at": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "deleted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "type_readable": {
+            "type": "string"
+          },
+          "currency_symbol": {
+            "type": "string"
+          }
+        }
+      },
+      "BankResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "connected",
+              "disconnected"
+            ]
+          },
+          "provider": {
+            "type": "string"
+          },
+          "bank_code": {
+            "type": "string"
+          },
+          "bank_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "accounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountResponse"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "nullable": true
+          },
+          "expires_at": {
+            "type": "string",
+            "nullable": true
+          },
+          "deleted_at": {
+            "type": "string",
+            "nullable": true
+          },
+          "redirect_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "connected_at": {
+            "type": "string",
+            "nullable": true
+          },
+          "last_synced_at": {
+            "type": "string",
+            "nullable": true
+          },
+          "disconnect_reason": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "CompanyResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "channel": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "TRY",
+              "USD",
+              "EUR",
+              "GBP"
+            ]
+          },
+          "logo_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "settings": {
+            "type": "object"
+          },
+          "district": {
+            "type": "string"
+          },
+          "postal_code": {
+            "type": "string"
+          },
+          "tax_office": {
+            "type": "string"
+          },
+          "tax_number": {
+            "type": "string"
+          },
+          "accounting": {
+            "type": "string",
+            "nullable": true
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "website_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "ioss": {
+            "type": "string",
+            "nullable": true
+          },
+          "voec": {
+            "type": "string",
+            "nullable": true
+          },
+          "pva": {
+            "type": "string",
+            "nullable": true
+          },
+          "mid": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_invoice_serial": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_archive_serial": {
+            "type": "string",
+            "nullable": true
+          },
+          "abilities": {
+            "type": "object",
+            "description": "Firma için hesaplanmış yetenek bayrakları. Yapılandırılabilirlik yalnızca firmanın muhasebe sağlayıcısına bağlı olduğundan, hem yukarıdaki firma seviyesindeki e_invoice_serial/e_archive_serial alanları için hem de firmanın her entegrasyonundaki aynı alanlar için geçerlidir.",
+            "properties": {
+              "e_invoice_serial_configurable": {
+                "type": "boolean",
+                "description": "Muhasebe sağlayıcısının özel bir e_invoice_serial yapılandırmasına izin verip vermediği (şu an QNB, Isnet, TrendyolEFaturam, ELogo, UyumsoftEInvoice, HepsiburadaEFaturam)."
+              },
+              "e_archive_serial_configurable": {
+                "type": "boolean",
+                "description": "Muhasebe sağlayıcısının özel bir e_archive_serial yapılandırmasına izin verip vermediği (şu an QNB, Isnet, TrendyolEFaturam, Mikro, ELogo, UyumsoftEInvoice, HepsiburadaEFaturam)."
+              }
+            }
+          },
+          "e_invoice_credit": {
+            "type": "integer"
+          },
+          "e_invoice_provider": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_invoicing_activated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "e_archiving_activated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "role": {
+            "type": "string"
+          }
+        }
+      },
+      "Address": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "district": {
+            "type": "string"
+          },
+          "postal_code": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductCreateRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "barcode",
+          "stock_code",
+          "price",
+          "market_price",
+          "type",
+          "is_active"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "barcode": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "stock_code": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "price": {
+            "type": "number"
+          },
+          "market_price": {
+            "type": "number"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "main",
+              "basic",
+              "variant",
+              "expense"
+            ]
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "tax_rate": {
+            "type": "number",
+            "enum": [
+              0,
+              1,
+              10,
+              20
+            ],
+            "nullable": true
+          },
+          "product_category_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "fulfillment_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "quantity": {
+            "type": "integer",
+            "nullable": true
+          },
+          "weight": {
+            "type": "number",
+            "nullable": true
+          },
+          "hs_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "shipment_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ProductResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "main",
+              "basic",
+              "variant",
+              "expense"
+            ]
+          },
+          "price": {
+            "type": "number",
+            "format": "float"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "barcode": {
+            "type": "string",
+            "nullable": true
+          },
+          "weight": {
+            "type": "number",
+            "nullable": true
+          },
+          "hs_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "variant": {
+            "type": "object",
+            "nullable": true
+          },
+          "tax_rate": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              10,
+              20
+            ]
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "deleted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "child_count": {
+            "type": "integer"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "stock_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "catalog": {
+            "type": "object",
+            "nullable": true
+          },
+          "warehouse_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "market_price": {
+            "type": "number",
+            "nullable": true
+          },
+          "shipment_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "fulfillment_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "parent_product_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "product_category_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "integration_product_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "source_integration_id": {
+            "type": "integer",
+            "nullable": true
+          }
+        }
+      },
+      "ProductJobResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "job": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job_readable": {
+            "type": "string"
+          },
+          "integration_id": {
+            "type": "integer"
+          },
+          "status_readable": {
+            "type": "string"
+          },
+          "retryable": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "OrderResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "order_id": {
+            "type": "string"
+          },
+          "order_id2": {
+            "type": "string",
+            "nullable": true
+          },
+          "group_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
+          },
+          "status_readable": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "e_invoice_status": {
+            "type": "string"
+          },
+          "e_invoice_document_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "invoice_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_invoice_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "discount_amount": {
+            "type": "number"
+          },
+          "last_error": {
+            "type": "string",
+            "nullable": true
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "push_ready": {
+            "type": "boolean"
+          },
+          "einvoice_created_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "pushed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "order_created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "final_amount": {
+            "type": "number"
+          },
+          "is_printed": {
+            "type": "boolean"
+          },
+          "customer_info": {
+            "type": "object"
+          },
+          "payment_method": {
+            "type": "string",
+            "nullable": true
+          },
+          "payment_method_readable": {
+            "type": "string",
+            "nullable": true
+          },
+          "payment_provider": {
+            "type": "string",
+            "nullable": true
+          },
+          "cargo_company_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "cargo_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "cargo_tracking_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "cargo_tracking_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "has_shipping": {
+            "type": "boolean"
+          },
+          "integration_id": {
+            "type": "integer"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "sale",
+              "return",
+              "cancel"
+            ]
+          },
+          "archived_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "issue_date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "due_date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "fulfillment_status": {
+            "type": "string",
+            "nullable": true
+          },
+          "exchange_rate": {
+            "type": "number",
+            "nullable": true
+          },
+          "paid_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "OrderCreateRequest": {
+        "type": "object",
+        "required": [
+          "customer_id",
+          "final_amount",
+          "e_invoice_status",
+          "description",
+          "currency",
+          "items"
+        ],
+        "properties": {
+          "customer_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "final_amount": {
+            "type": "number"
+          },
+          "e_invoice_status": {
+            "type": "string"
+          },
+          "has_shipping": {
+            "type": "boolean"
+          },
+          "payment_method": {
+            "type": "string",
+            "nullable": true
+          },
+          "payment_provider": {
+            "type": "string",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "order_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "product_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "integration_product_id": {
+                  "type": "integer",
+                  "nullable": true
+                },
+                "price": {
+                  "type": "number"
+                },
+                "quantity": {
+                  "type": "integer"
+                },
+                "discount": {
+                  "type": "number"
+                },
+                "tax_rate": {
+                  "type": "number"
+                },
+                "variants": {
+                  "type": "object",
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "tag_ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "shipping": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "country": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string"
+              },
+              "district": {
+                "type": "string"
+              },
+              "address": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "surname": {
+                "type": "string"
+              },
+              "contact_number": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              }
+            }
+          },
+          "same_as_billing": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "invoice_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "due_date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "order_created_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "issue_date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          }
+        }
+      },
+      "OrderShippingResponse": {
+        "type": "object",
+        "description": "Kargolanabilir siparişler için sipariş kargo bilgisi."
+      },
+      "PaymentResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "order_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "description": {
+            "type": "string"
+          },
+          "exchange_rate": {
+            "type": "number"
+          }
+        }
+      },
+      "BulkIdsRequest": {
+        "type": "object",
+        "required": [
+          "ids"
+        ],
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "OrdersEInvoiceRequest": {
+        "type": "object",
+        "required": [
+          "order_ids"
+        ],
+        "properties": {
+          "order_ids": {
+            "type": "array",
+            "description": "E-fatura oluşturulacak siparişlerin sayısal ID'leri.",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "e_invoice_scenario": {
+            "type": "string",
+            "description": "E-fatura senaryosu (basic veya commercial).",
+            "enum": [
+              "basic",
+              "commercial"
+            ]
+          }
+        }
+      },
+      "IntegrationResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "marketplace": {
+            "type": "string"
+          },
+          "marketplace_readable": {
+            "type": "string"
+          },
+          "subscription_id": {
+            "type": "integer"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "config_completed": {
+            "type": "boolean"
+          },
+          "config": {
+            "type": "object"
+          },
+          "options": {
+            "type": "object"
+          },
+          "domain": {
+            "type": "string",
+            "nullable": true
+          },
+          "website_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "contact_email": {
+            "type": "string",
+            "nullable": true
+          },
+          "cc_email": {
+            "type": "string",
+            "nullable": true
+          },
+          "summary_active": {
+            "type": "boolean"
+          },
+          "e_invoice_active": {
+            "type": "boolean"
+          },
+          "e_invoice_scenario": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_invoice_serial": {
+            "type": "string",
+            "nullable": true,
+            "description": "Özel e-fatura seri ön eki. Yalnızca firmanın muhasebe sağlayıcısı desteklediğinde kabul edilir (şu an QNB, Isnet, TrendyolEFaturam, ELogo, UyumsoftEInvoice, HepsiburadaEFaturam)."
+          },
+          "e_archive_serial": {
+            "type": "string",
+            "nullable": true,
+            "description": "Özel e-arşiv seri ön eki. Yalnızca firmanın muhasebe sağlayıcısı desteklediğinde kabul edilir (şu an QNB, Isnet, TrendyolEFaturam, Mikro, ELogo, UyumsoftEInvoice, HepsiburadaEFaturam). Bu alanların yapılandırılabilir olup olmadığı, yalnızca firmanın muhasebe sağlayıcısına bağlı olduğundan entegrasyon bazında değil, sahibi firmanın `abilities` alanında sunulur (bkz. `CompanyResponse`)."
+          },
+          "cargo_company_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "make_paid": {
+            "type": "boolean"
+          },
+          "tax_rate": {
+            "type": "number"
+          },
+          "send_invoice_mail": {
+            "type": "boolean"
+          },
+          "invoice_note": {
+            "type": "string",
+            "nullable": true
+          },
+          "email_note": {
+            "type": "string",
+            "nullable": true
+          },
+          "last_error": {
+            "type": "string",
+            "nullable": true
+          },
+          "deleted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "parent_integration_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "use_export_invoice": {
+            "type": "boolean"
+          }
+        }
+      },
+      "IntegrationProductResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "url": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "weight": {
+            "type": "number",
+            "nullable": true
+          },
+          "barcode": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "sync_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "on_sale": {
+            "type": "boolean"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "tax_rate": {
+            "type": "number"
+          },
+          "stock_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "child_count": {
+            "type": "integer"
+          },
+          "market_price": {
+            "type": "number",
+            "nullable": true
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "integration_id": {
+            "type": "integer"
+          },
+          "marketplace_id": {
+            "type": "string"
+          },
+          "marketplace_name": {
+            "type": "string"
+          },
+          "properties": {
+            "type": "object",
+            "nullable": true
+          },
+          "use_product_name": {
+            "type": "boolean"
+          },
+          "use_product_price": {
+            "type": "boolean"
+          },
+          "product_synced_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "IntegrationProductCategoryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "is_deep": {
+            "type": "boolean"
+          },
+          "parent_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "integration_id": {
+            "type": "integer"
+          },
+          "full_path": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "IntegrationProductPropertyResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "string",
+              "numeric",
+              "boolean",
+              "enum",
+              "array",
+              "strings"
+            ]
+          },
+          "property_id": {
+            "type": "string"
+          },
+          "is_customization": {
+            "type": "boolean"
+          },
+          "has_max": {
+            "type": "boolean"
+          },
+          "is_updatable": {
+            "type": "boolean"
+          },
+          "options": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "IntegrationWarehouseResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "integration_id": {
+            "type": "integer"
+          },
+          "integration_warehouse_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "warehouse_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CustomerResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "customer_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "Customer",
+              "Company"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "invoice_address": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "district": {
+            "type": "string",
+            "nullable": true
+          },
+          "tc": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "tax_number": {
+            "type": "string",
+            "nullable": true
+          },
+          "tax_office": {
+            "type": "string",
+            "nullable": true
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "nullable": true
+          },
+          "country_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "postal_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "integration_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "archived_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "is_vendor": {
+            "type": "boolean"
+          },
+          "balance": {
+            "type": "object",
+            "nullable": true
+          }
+        }
+      },
+      "CustomerCreateRequest": {
+        "type": "object",
+        "required": [
+          "type",
+          "name"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "Customer",
+              "Company"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 3
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "district": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "nullable": true
+          },
+          "tc": {
+            "type": "string",
+            "nullable": true
+          },
+          "tax_number": {
+            "type": "string",
+            "nullable": true
+          },
+          "tax_office": {
+            "type": "string",
+            "nullable": true
+          },
+          "invoice_address": {
+            "type": "string",
+            "nullable": true
+          },
+          "postal_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "is_vendor": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SubscriptionResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "price": {
+            "type": "number"
+          },
+          "channel": {
+            "type": "string"
+          },
+          "promotion": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "renewal_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deleted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "is_expired": {
+            "type": "boolean"
+          },
+          "renew_month": {
+            "type": "integer"
+          },
+          "package_count": {
+            "type": "integer"
+          },
+          "payment_method": {
+            "type": "string"
+          },
+          "integration_count": {
+            "type": "integer"
+          }
+        }
+      },
+      "SubscriptionCreateRequest": {
+        "type": "object",
+        "required": [
+          "package_id",
+          "renew_month"
+        ],
+        "properties": {
+          "package_id": {
+            "type": "integer"
+          },
+          "renew_month": {
+            "type": "integer"
+          },
+          "promotion_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "payment_method": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "credit-card",
+              "partnership"
+            ]
+          },
+          "card": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "number": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "year": {
+                "type": "string"
+              },
+              "month": {
+                "type": "string"
+              },
+              "cvc": {
+                "type": "string"
+              }
+            }
+          },
+          "billing": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "address": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string"
+              },
+              "district": {
+                "type": "string"
+              },
+              "country": {
+                "type": "string"
+              },
+              "tax_office": {
+                "type": "string"
+              },
+              "tax_number": {
+                "type": "string"
+              },
+              "postal_code": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "TaskResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "completed",
+              "failed"
+            ]
+          },
+          "progress": {
+            "type": "number"
+          },
+          "result": {
+            "type": "object",
+            "nullable": true
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "WarehouseResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "object",
+            "nullable": true
+          },
+          "is_default": {
+            "type": "boolean"
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "AccountTransactionResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "XmlResourceResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "InvoiceResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "package_name": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "amount_readable": {
+            "type": "string"
+          },
+          "accounting_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "paid_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "e_invoice_status": {
+            "type": "string",
+            "nullable": true
+          },
+          "e_invoice_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "PackageResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "code": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "sort": {
+            "type": "integer"
+          },
+          "price": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "country": {
+            "type": "string"
+          },
+          "prices": {
+            "type": "object"
+          },
+          "name_en": {
+            "type": "string"
+          },
+          "name_tr": {
+            "type": "string"
+          },
+          "unlimited": {
+            "type": "boolean"
+          },
+          "marketplaces": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/v2.0/company/{companyId}/product": {
+      "post": {
+        "tags": [
+          "Ürün"
+        ],
+        "summary": "Ürün oluştur",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nCreate a new product.",
+        "operationId": "createProduct",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ürün oluşturuldu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Product"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Ürün"
+        ],
+        "summary": "Toplu ürün güncelleme",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nUpdates multiple products at once.",
+        "operationId": "bulkUpdateProducts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "description": "Güncellenecek ürün UUID dizisi"
+                  }
+                },
+                "required": [
+                  "ids"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ürünler başarıyla güncellendi"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Ürün"
+        ],
+        "summary": "Toplu ürün silme",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nDeletes multiple products at once.",
+        "operationId": "bulkDeleteProducts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "description": "Silinecek ürün UUID dizisi"
+                  }
+                },
+                "required": [
+                  "ids"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ürünler başarıyla silindi"
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/product/status": {
+      "get": {
+        "tags": [
+          "Ürün"
+        ],
+        "summary": "Ürün durum sayıları",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nReturns counts of products grouped by status.",
+        "operationId": "getProductStatusCounts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Durum sayıları",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/product/restore": {
+      "post": {
+        "tags": [
+          "Ürün"
+        ],
+        "summary": "Toplu ürün geri yükleme",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nRestores multiple previously deleted products.",
+        "operationId": "bulkRestoreProducts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "description": "Geri yüklenecek ürün UUID dizisi"
+                  }
+                },
+                "required": [
+                  "ids"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ürünler başarıyla geri yüklendi"
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/product/{productId}": {
+      "get": {
+        "tags": [
+          "Ürün"
+        ],
+        "summary": "Ürün getir",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nReturns a single product by ID.",
+        "operationId": "getProduct",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/productId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ürün detayları",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Ürün"
+        ],
+        "summary": "Ürün güncelle",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nUpdates a single product.",
+        "operationId": "updateProduct",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/productId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "main",
+                      "basic",
+                      "variant",
+                      "expense"
+                    ]
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "tax_rate": {
+                    "type": "number",
+                    "nullable": true,
+                    "enum": [
+                      0,
+                      1,
+                      10,
+                      20
+                    ]
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  },
+                  "product_category_id": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "fulfillment_id": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "price": {
+                    "type": "number"
+                  },
+                  "market_price": {
+                    "type": "number"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "barcode": {
+                    "type": "string"
+                  },
+                  "stock_code": {
+                    "type": "string"
+                  },
+                  "weight": {
+                    "type": "number"
+                  },
+                  "hs_code": {
+                    "type": "string"
+                  },
+                  "shipment_name": {
+                    "type": "string"
+                  },
+                  "variant": {
+                    "type": "object",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "type",
+                  "is_active"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ürün güncellendi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/product/{productId}/image": {
+      "get": {
+        "tags": [
+          "Ürün"
+        ],
+        "summary": "Ürün görsellerini getir",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nReturns all images for a product.",
+        "operationId": "getProductImages",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/productId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ürün görselleri listesi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "sort": {
+                            "type": "integer"
+                          },
+                          "integration_image_ids": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Ürün"
+        ],
+        "summary": "Ürün görsellerini güncelle",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nUpdates the images for a product.",
+        "operationId": "updateProductImages",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/productId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "images": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "url": {
+                          "type": "string"
+                        },
+                        "sort": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "url",
+                        "sort"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "images"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Görseller başarıyla güncellendi"
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/product/{productId}/stock": {
+      "get": {
+        "tags": [
+          "Ürün"
+        ],
+        "summary": "Stok hareketlerini listele",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nReturns a paginated list of stock events for a product.",
+        "operationId": "listStockEvents",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/productId"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Sayfa başına öğe sayısı"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Sıralama alanı; azalan için başına - ekleyin (örn. -created_at)"
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Dahil edilecek, virgülle ayrılmış ilişkiler"
+          },
+          {
+            "name": "with_trashed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Silinmiş (soft-delete) öğeleri dahil et"
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Arşivlenmiş öğeleri dahil et"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sayfalanmış stok hareketi listesi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "quantity": {
+                            "type": "integer"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Ürün"
+        ],
+        "summary": "Stok hareketi oluştur",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nCreates a new stock event for a product. Prefix quantity with '=' for absolute value.",
+        "operationId": "createStockEvent",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/productId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "quantity": {
+                    "type": "integer",
+                    "description": "Stok miktarı değişimi. Mutlak değer için başına '=' ekleyin (örn. '=10' stoğu 10 yapar)."
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "quantity"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Stok hareketi oluşturuldu"
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/orders": {
+      "get": {
+        "tags": [
+          "Sipariş"
+        ],
+        "summary": "Siparişleri listele",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nRetrieve a paginated list of orders using cursor pagination.",
+        "operationId": "listOrders",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            },
+            "description": "Sayfa başına sonuç sayısı."
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Sıralama alanı. Azalan sıralama için başına - ekleyin."
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Dahil edilecek, virgülle ayrılmış ilişkiler (örn. orderPackages,customer,shipping,orderItems)."
+          },
+          {
+            "name": "with_trashed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Silinmiş (soft-delete) siparişleri dahil et."
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Arşivlenmiş siparişleri dahil et."
+          },
+          {
+            "name": "integration_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Entegrasyona göre filtrele."
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "sale",
+                "return",
+                "cancel"
+              ]
+            },
+            "description": "Sipariş türüne göre filtrele."
+          },
+          {
+            "name": "statuses",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtrelenecek, virgülle ayrılmış sipariş durumları."
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Birden çok alanda ara."
+          },
+          {
+            "name": "order_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Belirli bir sipariş ID'sine göre filtrele."
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Bu tarihte veya sonrasında oluşturulan siparişleri filtrele."
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Bu tarihte veya öncesinde oluşturulan siparişleri filtrele."
+          },
+          {
+            "name": "start_order_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Sipariş ID aralığı başlangıcı."
+          },
+          {
+            "name": "end_order_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Sipariş ID aralığı bitişi."
+          },
+          {
+            "name": "customer_name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Müşteri adına göre filtrele."
+          },
+          {
+            "name": "cargo_code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Kargo koduna göre filtrele."
+          },
+          {
+            "name": "cargo_tracking_code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Kargo takip koduna göre filtrele."
+          },
+          {
+            "name": "order_package_code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Sipariş paketi koduna göre filtrele."
+          },
+          {
+            "name": "has_cargo_code",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Kargo kodu olan siparişleri filtrele."
+          },
+          {
+            "name": "has_cargo_tracking_code",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Kargo takip kodu olan siparişleri filtrele."
+          },
+          {
+            "name": "is_cargo_code_cancelled",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Kargo kodu iptal edilmiş (shipment_status = cancelled) siparişleri, hiç kodu olmayanların aksine filtrele."
+          },
+          {
+            "name": "cargo_company",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Kargo firması ID'sine göre filtrele."
+          },
+          {
+            "name": "shipment_country_code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Gönderi ülke koduna göre filtrele."
+          },
+          {
+            "name": "shipment_status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Gönderi durumuna göre filtrele."
+          },
+          {
+            "name": "is_printed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Yazdırma durumuna göre filtrele."
+          },
+          {
+            "name": "print_start_date",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Yazdırma tarih aralığı başlangıcına göre filtrele."
+          },
+          {
+            "name": "print_end_date",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Yazdırma tarih aralığı bitişine göre filtrele."
+          },
+          {
+            "name": "edit_needed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Düzenlenmesi gereken siparişleri filtrele."
+          },
+          {
+            "name": "is_pushed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Muhasebeye gönderilme durumuna göre filtrele."
+          },
+          {
+            "name": "push_start_at",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Gönderim tarih aralığı başlangıcına göre filtrele."
+          },
+          {
+            "name": "push_end_at",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Gönderim tarih aralığı bitişine göre filtrele."
+          },
+          {
+            "name": "is_invoiced",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "E-faturası olan siparişleri filtrele."
+          },
+          {
+            "name": "only_zero_tax",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Yalnızca sıfır vergili siparişleri filtrele."
+          },
+          {
+            "name": "order_pushable",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Gönderime hazır siparişleri filtrele."
+          },
+          {
+            "name": "is_sale",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Satış siparişlerini filtrele."
+          },
+          {
+            "name": "is_expense",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Gider siparişlerini filtrele."
+          },
+          {
+            "name": "integration_product_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Entegrasyon ürünü ID'sine göre filtrele."
+          },
+          {
+            "name": "integration_product_ids",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Virgülle ayrılmış entegrasyon ürünü ID'leri."
+          },
+          {
+            "name": "product_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Ürün ID'sine göre filtrele."
+          },
+          {
+            "name": "product_ids",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Virgülle ayrılmış ürün UUID'leri."
+          },
+          {
+            "name": "tag_ids",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Virgülle ayrılmış etiket ID'leri."
+          },
+          {
+            "name": "payment_method",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Ödeme yöntemine göre filtrele."
+          },
+          {
+            "name": "e_invoice_status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "E-fatura durumuna göre filtrele."
+          },
+          {
+            "name": "push_ready",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Gönderime hazır bayrağına göre filtrele."
+          },
+          {
+            "name": "has_shipping",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Kargo uygunluğuna göre filtrele."
+          },
+          {
+            "name": "currency",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Para birimi koduna göre filtrele."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sayfalanmış sipariş listesi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/OrderResponse"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Sipariş"
+        ],
+        "summary": "Sipariş oluştur",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nCreate a new order.",
+        "operationId": "createOrder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Sipariş başarıyla oluşturuldu.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OrderResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Sipariş"
+        ],
+        "summary": "Toplu sipariş güncelleme",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nUpdate multiple orders at once.",
+        "operationId": "bulkUpdateOrders",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ids"
+                ],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  },
+                  "fields": {
+                    "type": "object",
+                    "description": "Her siparişte güncellenecek alanlar."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Siparişler başarıyla güncellendi."
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/orders/{orderId}": {
+      "get": {
+        "tags": [
+          "Sipariş"
+        ],
+        "summary": "Sipariş getir",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nRetrieve a single order by its identifier.",
+        "operationId": "getOrder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/orderId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sipariş detayları.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OrderResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Sipariş"
+        ],
+        "summary": "Sipariş güncelle",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nUpdate an existing order.",
+        "operationId": "updateOrder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/orderId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sipariş başarıyla güncellendi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OrderResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Sipariş"
+        ],
+        "summary": "Sipariş sil",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nDelete a single order.",
+        "operationId": "deleteOrder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/orderId"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Sipariş başarıyla silindi."
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/orders/{orderId}/cancel": {
+      "delete": {
+        "tags": [
+          "Sipariş"
+        ],
+        "summary": "Tekil sipariş iptali",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nCancel a single order.",
+        "operationId": "cancelOrder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/orderId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sipariş başarıyla iptal edildi."
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/orders/{orderId}/pull": {
+      "get": {
+        "tags": [
+          "Sipariş"
+        ],
+        "summary": "Entegrasyondan sipariş çek",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nPull the latest order data from the connected integration.",
+        "operationId": "pullOrder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/orderId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sipariş başarıyla çekildi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OrderResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/orders/push": {
+      "post": {
+        "tags": [
+          "Sipariş"
+        ],
+        "summary": "Siparişleri muhasebeye gönder",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nPush one or more orders to the connected accounting integration.",
+        "operationId": "pushOrders",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkIdsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Siparişler başarıyla gönderildi."
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/orders/e-invoice": {
+      "post": {
+        "tags": [
+          "Sipariş"
+        ],
+        "summary": "E-fatura oluştur",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nGenerate e-invoices for the specified orders.",
+        "operationId": "generateEInvoice",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrdersEInvoiceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "E-faturalar başarıyla oluşturuldu."
+          }
+        }
+      }
+    },
+    "/v1.0/company/{companyId}/integration/{integrationId}/shipping": {
+      "get": {
+        "tags": [
+          "Sipariş Kargo"
+        ],
+        "summary": "Kargolanabilir siparişleri listele",
+        "description": "> **Gerekli kapsam:** `order:read`\n\nRetrieve a paginated list of orders ready for shipping.",
+        "operationId": "listShippableOrders",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Sayfa başına sonuç sayısı."
+          },
+          {
+            "name": "ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Sipariş tanımlayıcılarına göre filtrele."
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Sonuçların sıralanacağı alan."
+          },
+          {
+            "name": "is_printed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Yazdırma durumuna göre filtrele."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kargolanabilir siparişlerin sayfalanmış listesi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/OrderShippingResponse"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1.0/company/{companyId}/integration/{integrationId}/shipping-slip": {
+      "get": {
+        "tags": [
+          "Sipariş Kargo"
+        ],
+        "summary": "Siparişler için kargo fişi yazdır",
+        "description": "> **Gerekli kapsam:** `order:read`\n\nCreates a background task that generates shipping slip PDFs.\nAlways use mode=task to get a JSON task response.\n",
+        "operationId": "generateShippingSlip",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          },
+          {
+            "name": "ids",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Siparişlerin sayısal ID'leri (\"id\" alanı, \"order_id\" DEĞİL)"
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "task"
+              ]
+            },
+            "description": "Arka plan görevi oluşturmak için \"task\" olmalıdır"
+          },
+          {
+            "name": "with",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "invoice",
+                  "slip"
+                ]
+              }
+            },
+            "description": "Dahil edilecek belgeler. Kargo fişi için 'slip', e-fatura için 'invoice' veya her ikisini kullanın"
+          },
+          {
+            "name": "is_portrait",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Dikey yönlendirme kullan"
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Siparişleri ürüne göre sırala"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kargo fişleri oluşturmak için görev oluşturuldu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Görev detayları"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2.0/company/{companyId}/integration/{integrationId}/order/{orderId}/shipping": {
+      "put": {
+        "tags": [
+          "Sipariş Kargo"
+        ],
+        "summary": "Kargo güncelle",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nUpdate shipping information for an order within an integration.",
+        "operationId": "updateShipping",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          },
+          {
+            "$ref": "#/components/parameters/orderId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "address": {
+                    "type": "object",
+                    "description": "Kargo adresi detayları."
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "cargo_integration": {
+                    "type": "object",
+                    "description": "Kargo entegrasyon yapılandırması."
+                  },
+                  "payment_info": {
+                    "type": "object",
+                    "description": "Ödeme bilgisi."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Kargo başarıyla güncellendi."
+          }
+        }
+      }
+    },
+    "/v1.0/company/{companyId}/integration/{integrationId}/product": {
+      "get": {
+        "tags": [
+          "Entegrasyon Ürünü"
+        ],
+        "summary": "Entegrasyon ürünlerini listele",
+        "operationId": "listIntegrationProducts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "İsim, stok kodu, barkod, marketplace_product_id alanlarında ara.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "suggest",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "description": "Dahil edilecek ilişkiler.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "with_recommend",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "importable",
+            "in": "query",
+            "description": "İçe aktarılabilir ürünleri filtrele.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "accounting_id",
+            "in": "query",
+            "description": "Muhasebe ID'sine göre filtrele (null desteklenir).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tax_rate",
+            "in": "query",
+            "description": "Vergi oranına göre filtrele.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "ids",
+            "in": "query",
+            "description": "Virgülle ayrılmış ID'ler.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sıralama alanı.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sayfalanmış entegrasyon ürünü listesi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/IntegrationProductResponse"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "pagination": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** `integration-product:read`"
+      },
+      "put": {
+        "tags": [
+          "Entegrasyon Ürünü"
+        ],
+        "summary": "Toplu entegrasyon ürünü güncelleme",
+        "operationId": "bulkUpdateIntegrationProducts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "accounting_id": {
+                    "type": "string"
+                  },
+                  "tax_rate": {
+                    "type": "number"
+                  },
+                  "hs_code": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ürünler güncellendi."
+          }
+        },
+        "description": "> **Gerekli kapsam:** `integration-product:update`"
+      }
+    },
+    "/v2.0/company/{companyId}/integration/{integrationId}/product/{integrationProductId}": {
+      "get": {
+        "tags": [
+          "Entegrasyon Ürünü"
+        ],
+        "summary": "Tekil entegrasyon ürünü getir",
+        "operationId": "getIntegrationProduct",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          },
+          {
+            "name": "integrationProductId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Entegrasyon ürünü detayları.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/IntegrationProductResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      },
+      "put": {
+        "tags": [
+          "Entegrasyon Ürünü"
+        ],
+        "summary": "Tekil entegrasyon ürünü güncelle",
+        "operationId": "updateIntegrationProduct",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          },
+          {
+            "name": "integrationProductId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "product_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "accounting_id": {
+                    "type": "string"
+                  },
+                  "tax_rate": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Entegrasyon ürünü güncellendi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/IntegrationProductResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/integration/{integrationId}/product-category": {
+      "get": {
+        "tags": [
+          "Entegrasyon Kategorisi"
+        ],
+        "summary": "Entegrasyon ürün kategorilerini listele",
+        "operationId": "listIntegrationCategories",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "with_child",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "İsimde ara.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "used_by",
+            "in": "query",
+            "description": "Entegrasyon ID'sine göre filtrele.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Kategori ID'sine göre filtrele.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Kategori adına göre filtrele.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "parent_id",
+            "in": "query",
+            "description": "Üst kategori ID'sine göre filtrele.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "is_deep",
+            "in": "query",
+            "description": "Derin kategori durumuna göre filtrele.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "full_path",
+            "in": "query",
+            "description": "Tam yola göre filtrele.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sıralama alanı.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sayfalanmış kategori listesi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/IntegrationProductCategoryResponse"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "pagination": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/integration/{integrationId}/property": {
+      "get": {
+        "tags": [
+          "Entegrasyon Özelliği"
+        ],
+        "summary": "Entegrasyon özelliklerini listele",
+        "operationId": "listIntegrationProperties",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "product_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "product_type",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Entegrasyon özellikleri listesi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/IntegrationProductPropertyResponse"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/integration/{integrationId}/warehouses": {
+      "get": {
+        "tags": [
+          "Entegrasyon Deposu"
+        ],
+        "summary": "Entegrasyon depolarını listele",
+        "operationId": "listIntegrationWarehouses",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Entegrasyon depoları listesi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/IntegrationWarehouseResponse"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/integration/{integrationId}/statuses": {
+      "get": {
+        "tags": [
+          "Entegrasyon"
+        ],
+        "summary": "Entegrasyon durumlarını getir",
+        "operationId": "getIntegrationStatuses",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Durum listesi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/integration/{integrationId}/inventory": {
+      "get": {
+        "tags": [
+          "Entegrasyon"
+        ],
+        "summary": "Entegrasyon envanterini getir",
+        "operationId": "getIntegrationInventory",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "$ref": "#/components/parameters/integrationId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Envanter verisi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/customers": {
+      "get": {
+        "tags": [
+          "Müşteri"
+        ],
+        "summary": "Müşterileri listele",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nReturns a cursor-paginated list of customers.",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "İsim, telefon, e-posta, TC, vergi numarasında ara",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "is_vendor",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "tag_ids",
+            "in": "query",
+            "description": "Virgülle ayrılmış etiket ID'leri",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "balance",
+            "in": "query",
+            "description": "Operatör tabanlı filtre (örn. balance>=100, balance>0)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "with_trashed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sayfalanmış müşteri dizisi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CustomerResponse"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Müşteri"
+        ],
+        "summary": "Müşteri oluştur",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Müşteri oluşturuldu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      },
+      "put": {
+        "tags": [
+          "Müşteri"
+        ],
+        "summary": "Toplu müşteri güncelleme (etiketler)",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "tag_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Müşteriler güncellendi"
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/customer/{customerId}/payment": {
+      "post": {
+        "tags": [
+          "Müşteri"
+        ],
+        "summary": "Müşteri için ödeme oluştur",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "amount"
+                ],
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "account_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ödeme oluşturuldu"
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/customer/{customerId}/payments": {
+      "get": {
+        "tags": [
+          "Müşteri"
+        ],
+        "summary": "Müşteri ödemelerini listele",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ödeme listesi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/reports/expense-amount": {
+      "get": {
+        "tags": [
+          "Rapor"
+        ],
+        "summary": "Toplam giderler",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "integration_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Toplam gider tutarı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/reports/income-amount": {
+      "get": {
+        "tags": [
+          "Rapor"
+        ],
+        "summary": "Toplam gelirler",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "integration_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Toplam gelir tutarı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/reports/sale-count": {
+      "get": {
+        "tags": [
+          "Rapor"
+        ],
+        "summary": "Satış adedini getir",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "integration_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Satış adedi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/reports/income": {
+      "get": {
+        "tags": [
+          "Rapor"
+        ],
+        "summary": "Döneme göre gelirler",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "integration_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Döneme göre gelirler",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "date": {
+                        "type": "string"
+                      },
+                      "amount": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/reports/expense": {
+      "get": {
+        "tags": [
+          "Rapor"
+        ],
+        "summary": "Döneme göre giderler",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "integration_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Döneme göre giderler",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "date": {
+                        "type": "string"
+                      },
+                      "amount": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/reports/product": {
+      "get": {
+        "tags": [
+          "Rapor"
+        ],
+        "summary": "Ürün satış raporu",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "integration_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ürün satışları",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "product_id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "quantity": {
+                            "type": "integer"
+                          },
+                          "amount": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/reports/integration-product": {
+      "get": {
+        "tags": [
+          "Rapor"
+        ],
+        "summary": "Entegrasyon ürünü satış raporu",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "integration_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Entegrasyon ürünü satışları",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/reports/integration": {
+      "get": {
+        "tags": [
+          "Rapor"
+        ],
+        "summary": "Entegrasyona göre satışlar",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "integration_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Entegrasyona göre satışlar",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "integration_id": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "amount": {
+                        "type": "number"
+                      },
+                      "count": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/reports/product-category": {
+      "get": {
+        "tags": [
+          "Rapor"
+        ],
+        "summary": "Ürün kategorisine göre satışlar",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "integration_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kategoriye göre satışlar",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/reports/integration-product-category": {
+      "get": {
+        "tags": [
+          "Rapor"
+        ],
+        "summary": "Entegrasyon ürün kategorisine göre satışlar",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "integration_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Entegrasyon kategorisine göre satışlar",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/tags": {
+      "get": {
+        "tags": [
+          "Etiket"
+        ],
+        "summary": "Etiketleri listele",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "order",
+                "customer",
+                "product"
+              ]
+            }
+          },
+          {
+            "name": "ids",
+            "in": "query",
+            "description": "Virgülle ayrılmış etiket ID'leri",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Etiket dizisi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/tag": {
+      "post": {
+        "tags": [
+          "Etiket"
+        ],
+        "summary": "Etiket oluştur",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "type"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "order",
+                      "customer",
+                      "product"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Etiket oluşturuldu"
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/tag/{tagId}": {
+      "get": {
+        "tags": [
+          "Etiket"
+        ],
+        "summary": "Etiket getir",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "tagId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Etiket detayları",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      },
+      "put": {
+        "tags": [
+          "Etiket"
+        ],
+        "summary": "Etiket güncelle",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "tagId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "order",
+                      "customer",
+                      "product"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Etiket güncellendi"
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      },
+      "delete": {
+        "tags": [
+          "Etiket"
+        ],
+        "summary": "Etiket sil",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "tagId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Etiket silindi"
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/warehouse": {
+      "get": {
+        "tags": [
+          "Depo"
+        ],
+        "summary": "Depoları listele",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Depo dizisi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WarehouseResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      },
+      "post": {
+        "tags": [
+          "Depo"
+        ],
+        "summary": "Depo oluştur",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "is_default": {
+                    "type": "boolean"
+                  },
+                  "accounting_id": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "address": {
+                    "type": "object",
+                    "nullable": true
+                  },
+                  "phone": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Depo oluşturuldu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarehouseResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/warehouse/{warehouseId}": {
+      "get": {
+        "tags": [
+          "Depo"
+        ],
+        "summary": "Depo getir",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "warehouseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Depo detayları",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarehouseResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      },
+      "put": {
+        "tags": [
+          "Depo"
+        ],
+        "summary": "Depo güncelle",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "warehouseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "is_default": {
+                    "type": "boolean"
+                  },
+                  "accounting_id": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "address": {
+                    "type": "object",
+                    "nullable": true
+                  },
+                  "phone": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Depo güncellendi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarehouseResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/product-category": {
+      "get": {
+        "tags": [
+          "Ürün Kategorisi"
+        ],
+        "summary": "Ürün kategorilerini listele",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "İsimde ara",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "synced_with",
+            "in": "query",
+            "description": "Entegrasyon ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "not_synced_with",
+            "in": "query",
+            "description": "Entegrasyon ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "has_properties_with",
+            "in": "query",
+            "description": "Özellikleriyle birlikte entegrasyon ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "havent_properties_with",
+            "in": "query",
+            "description": "Özellikleri olmadan entegrasyon ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sayfalanmış ürün kategorisi dizisi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "note": {
+                            "type": "string",
+                            "nullable": true
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      },
+      "post": {
+        "tags": [
+          "Ürün Kategorisi"
+        ],
+        "summary": "Ürün kategorisi oluştur",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "note": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ürün kategorisi oluşturuldu"
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      },
+      "delete": {
+        "tags": [
+          "Ürün Kategorisi"
+        ],
+        "summary": "Toplu ürün kategorisi silme",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Kategoriler silindi"
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    },
+    "/v2.0/company/{companyId}/product-category/{categoryId}": {
+      "get": {
+        "tags": [
+          "Ürün Kategorisi"
+        ],
+        "summary": "Ürün kategorisi getir",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "categoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kategori detayları",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "note": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      },
+      "put": {
+        "tags": [
+          "Ürün Kategorisi"
+        ],
+        "summary": "Ürün kategorisi güncelle",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "categoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "note": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Kategori güncellendi"
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      },
+      "delete": {
+        "tags": [
+          "Ürün Kategorisi"
+        ],
+        "summary": "Ürün kategorisi sil",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "categoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Kategori silindi"
+          }
+        },
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı"
+      }
+    }
+  }
+}
