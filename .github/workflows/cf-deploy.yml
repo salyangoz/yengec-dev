@@ -1,0 +1,17 @@
+name: Deploy to Cloudflare
+
+# Triggers the Cloudflare "auto-deploy" build hook on every push to master
+# (and on manual dispatch). Cloudflare then builds + deploys from the repo.
+# Requires repo secret CF_DEPLOY_HOOK = the Workers Builds deploy-hook URL
+# (Cloudflare dashboard → the project → Settings → Builds → Deploy hooks).
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Cloudflare deploy hook
+        run: curl -fsSL -X POST "${{ secrets.CF_DEPLOY_HOOK }}"

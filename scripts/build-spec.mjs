@@ -206,6 +206,16 @@ function build(lang) {
 
   if (lang === 'tr') deepTranslate(out)
 
+  // API-App auth is bearer-only: the Client middleware bypasses the
+  // client-id/secret check for API-App tokens, so the reference must show only
+  // Bearer auth (the source spec also declares apiKeyClientId/apiKeyClientSecret
+  // for other, non-API-App callers — not relevant here).
+  out.security = [{ bearerAuth: [] }]
+  if (out.components && out.components.securitySchemes) {
+    const bearer = out.components.securitySchemes.bearerAuth
+    out.components.securitySchemes = bearer ? { bearerAuth: bearer } : {}
+  }
+
   // Inject the required-scope note (after translation, so it isn't itself a
   // translation target and the underlying description is already localized).
   for (const [path, item] of Object.entries(out.paths)) {

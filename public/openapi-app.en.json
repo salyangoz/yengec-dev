@@ -131,9 +131,7 @@
   ],
   "security": [
     {
-      "bearerAuth": [],
-      "apiKeyClientId": [],
-      "apiKeyClientSecret": []
+      "bearerAuth": []
     }
   ],
   "components": {
@@ -142,18 +140,6 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
-      },
-      "apiKeyClientId": {
-        "type": "apiKey",
-        "in": "header",
-        "name": "client-id",
-        "description": "OAuth client ID from Passport"
-      },
-      "apiKeyClientSecret": {
-        "type": "apiKey",
-        "in": "header",
-        "name": "client-secret",
-        "description": "OAuth client secret from Passport"
       }
     },
     "parameters": {
