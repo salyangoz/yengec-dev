@@ -48,6 +48,7 @@ Git**) and use:
 
 | Setting | Value |
 |---|---|
+| Production branch | `master` |
 | Framework preset | None (Vite) |
 | Build command | `npm run build` |
 | Build output directory | `dist` |
@@ -55,15 +56,15 @@ Git**) and use:
 
 SPA routing is handled by `public/_redirects` (`/* /index.html 200`). CF Pages auto-builds on every
 push to the production branch and gives preview URLs for PRs. Point a custom domain
-(e.g. `developers.yengec.co`) at the Pages project in the dashboard. `npm run build-spec` is a
+(e.g. `dev.yengec.co`) at the Pages project in the dashboard. `npm run build-spec` is a
 dev-time step (needs php + yengec-api); the committed `public/openapi-app.*.json` is what CF builds.
 
 ### Option B — Self-hosted k8s (nginx)
 
 Static build served by nginx (`Dockerfile` → `nginx.conf`), Docker Hub image
 `salyangoz/yengec-developer-hub:latest`, `k8s/` manifests (Deployment/Service/Ingress/HPA),
-ingress host `developers.yengec.co`. CI in `.github/workflows/production-deploy.yml` (push to
-`production`). **Ops prerequisites:** DNS for `developers.yengec.co`, the `app-runner` self-hosted
+ingress host `dev.yengec.co`. CI in `.github/workflows/production-deploy.yml` (push to
+`production`). **Ops prerequisites:** DNS for `dev.yengec.co`, the `app-runner` self-hosted
 runner (or a dedicated one), and the `DOCKER_USERNAME`/`DOCKER_PAT`/`SLACK_WEBHOOK` secrets. If you go
 with Cloudflare Pages, the `Dockerfile`/`nginx.conf`/`k8s/`/`production-deploy.yml` files are optional
 and can be removed.

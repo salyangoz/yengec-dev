@@ -5,7 +5,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: developers.yengec.co
+    - host: dev.yengec.co
       http:
         paths:
           - path: /
