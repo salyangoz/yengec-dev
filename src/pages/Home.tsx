@@ -7,7 +7,6 @@ import {
   ShoppingCart,
   Users,
   Truck,
-  Store,
   BarChart3,
 } from 'lucide-react'
 import { useI18n } from '@/i18n'
@@ -24,7 +23,6 @@ export function Home() {
     { icon: ShoppingCart, ...t.home.capabilities.orders },
     { icon: Users, ...t.home.capabilities.customers },
     { icon: Truck, ...t.home.capabilities.cargo },
-    { icon: Store, ...t.home.capabilities.integrations },
     { icon: BarChart3, ...t.home.capabilities.reports },
   ]
 

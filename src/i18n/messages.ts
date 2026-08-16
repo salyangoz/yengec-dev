@@ -47,10 +47,6 @@ const tr = {
         title: 'Kargo & gönderi',
         desc: 'Kargo oluşturun, iptal edin ve gönderi durumunu takip edin.',
       },
-      integrations: {
-        title: 'Pazaryeri entegrasyonları',
-        desc: 'Entegrasyon ayarları, ürün ve sipariş senkronizasyonu.',
-      },
       reports: {
         title: 'Raporlar',
         desc: 'Satış, gelir, gider ve ürün raporlarına erişin.',
@@ -109,10 +105,6 @@ const en: Messages = {
       cargo: {
         title: 'Cargo & shipping',
         desc: 'Create and cancel cargo and track shipment status.',
-      },
-      integrations: {
-        title: 'Marketplace integrations',
-        desc: 'Integration settings, product and order synchronization.',
       },
       reports: {
         title: 'Reports',
