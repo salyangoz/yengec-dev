@@ -37,14 +37,10 @@ run `npm run build-spec` to regenerate.
 > (customer show/update/delete, orders summary/patch, cargo, a few v1 integration-order and
 > product-list routes). They need authoring in `yengec-api/docs/paths/*.yaml` to appear here.
 
-## Deploy
+## Deploy — Cloudflare Pages
 
-Two options — pick one.
-
-### Option A — Cloudflare Pages (recommended for a static SPA)
-
-Connect the GitHub repo in the Cloudflare dashboard (**Workers & Pages → Create → Pages → Connect to
-Git**) and use:
+Deployed via **Cloudflare Pages**, connected to this repo (**Workers & Pages → Create → Pages →
+Connect to Git**):
 
 | Setting | Value |
 |---|---|
@@ -54,17 +50,10 @@ Git**) and use:
 | Build output directory | `dist` |
 | Node version | `20` (from `.nvmrc`, or set `NODE_VERSION=20`) |
 
-SPA routing is handled by `public/_redirects` (`/* /index.html 200`). CF Pages auto-builds on every
-push to the production branch and gives preview URLs for PRs. Point a custom domain
-(e.g. `dev.yengec.co`) at the Pages project in the dashboard. `npm run build-spec` is a
-dev-time step (needs php + yengec-api); the committed `public/openapi-app.*.json` is what CF builds.
+- SPA routing is handled by `public/_redirects` (`/* /index.html 200`).
+- CF Pages auto-builds on every push to `master` and gives preview URLs for PRs.
+- Custom domain: **`dev.yengec.co`** (Pages project → Custom domains).
+- `npm run build-spec` is a dev-time step (needs php + yengec-api); the committed
+  `public/openapi-app.*.json` is what CF builds — CF needs neither php nor yengec-api.
 
-### Option B — Self-hosted k8s (nginx)
-
-Static build served by nginx (`Dockerfile` → `nginx.conf`), Docker Hub image
-`salyangoz/yengec-developer-hub:latest`, `k8s/` manifests (Deployment/Service/Ingress/HPA),
-ingress host `dev.yengec.co`. CI in `.github/workflows/production-deploy.yml` (push to
-`production`). **Ops prerequisites:** DNS for `dev.yengec.co`, the `app-runner` self-hosted
-runner (or a dedicated one), and the `DOCKER_USERNAME`/`DOCKER_PAT`/`SLACK_WEBHOOK` secrets. If you go
-with Cloudflare Pages, the `Dockerfile`/`nginx.conf`/`k8s/`/`production-deploy.yml` files are optional
-and can be removed.
+CI (`.github/workflows/test.yml`) runs lint + build on PRs.
