@@ -7,3 +7,7 @@ dist-ssr
 .env.*
 !.env.example
 node_modules/.tmp
+
+# Cloudflare Wrangler
+.wrangler
+wrangler.jsonc

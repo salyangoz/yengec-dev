@@ -50,8 +50,10 @@ Connect to Git**):
 | Build output directory | `dist` |
 | Node version | `20` (from `.nvmrc`, or set `NODE_VERSION=20`) |
 
-- SPA routing is handled by `public/_redirects` (`/* /index.html 200`).
-- CF Pages auto-builds on every push to `master` and gives preview URLs for PRs.
+- SPA routing (`/guide`, `/reference`) is handled by Cloudflare's static-assets
+  `not_found_handling: "single-page-application"` — do **not** add a `_redirects` `/* /index.html`
+  rule; the Workers assets runtime rejects it as an infinite loop.
+- Cloudflare auto-builds on every push to `master` and gives preview URLs for PRs.
 - Custom domain: **`dev.yengec.co`** (Pages project → Custom domains).
 - `npm run build-spec` is a dev-time step (needs php + yengec-api); the committed
   `public/openapi-app.*.json` is what CF builds — CF needs neither php nor yengec-api.
