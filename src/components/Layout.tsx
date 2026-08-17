@@ -15,30 +15,31 @@ export function Layout() {
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-b border-border bg-card/90 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-4">
+        <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4 sm:gap-6">
           <Link to="/" className="flex items-center gap-2.5">
             <img src="/yengec-logo.svg" alt="Yengeç" className="h-6 w-auto" />
-            <span className="border-l border-border pl-2.5 text-sm font-semibold text-muted">
+            <span className="hidden border-l border-border pl-2.5 text-sm font-semibold text-muted sm:inline">
               Developer Hub
             </span>
           </Link>
-          <nav className="ml-auto flex items-center gap-1">
+          <nav className="ml-auto flex items-center gap-0.5 sm:gap-1">
             {nav.map(({ to, label, icon: Icon, end }) => (
               <NavLink
                 key={to}
                 to={to}
                 end={end}
+                title={label}
                 className={({ isActive }) =>
                   cn(
-                    'flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                    'flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors sm:px-3',
                     isActive
                       ? 'bg-brand-50 text-brand-700'
                       : 'text-muted hover:bg-brand-50/60 hover:text-brand-700',
                   )
                 }
               >
-                <Icon size={16} />
-                {label}
+                <Icon size={16} className="shrink-0" />
+                <span className="hidden sm:inline">{label}</span>
               </NavLink>
             ))}
           </nav>
