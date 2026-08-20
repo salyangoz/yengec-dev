@@ -11,6 +11,7 @@ export const FIELD_TR = {
   'Array of product UUIDs to update': 'Güncellenecek ürün UUID dizisi',
   'Array of tags': 'Etiket dizisi',
   'Array of warehouses': 'Depo dizisi',
+  'Cancel a single order.': 'Tekil siparişi iptal eder.',
   'Cargo integration configuration.': 'Kargo entegrasyon yapılandırması.',
   'Categories deleted': 'Kategoriler silindi',
   'Category deleted': 'Kategori silindi',
@@ -19,14 +20,29 @@ export const FIELD_TR = {
   'Comma-separated IDs.': "Virgülle ayrılmış ID'ler.",
   'Comma-separated integration product IDs.': "Virgülle ayrılmış entegrasyon ürünü ID'leri.",
   'Comma-separated order statuses to filter by.': 'Filtrelenecek, virgülle ayrılmış sipariş durumları.',
+  'Comma-separated product UUIDs': "Virgülle ayrılmış ürün UUID'leri",
   'Comma-separated product UUIDs.': "Virgülle ayrılmış ürün UUID'leri.",
   'Comma-separated relations to include': 'Dahil edilecek, virgülle ayrılmış ilişkiler',
+  'Comma-separated relations to include (e.g., category,images,integrationProducts).':
+    'Dahil edilecek, virgülle ayrılmış ilişkiler (örn. category,images,integrationProducts).',
+  'Comma-separated relations to include (e.g., customer,account).':
+    'Dahil edilecek, virgülle ayrılmış ilişkiler (örn. customer,account).',
+  'Comma-separated relations to include (e.g., integration,tags).':
+    'Dahil edilecek, virgülle ayrılmış ilişkiler (örn. integration,tags).',
+  'Comma-separated relations to include (e.g., integrations,integrationProductCategory).':
+    'Dahil edilecek, virgülle ayrılmış ilişkiler (örn. integrations,integrationProductCategory).',
   'Comma-separated relations to include (e.g., orderPackages,customer,shipping,orderItems).':
     'Dahil edilecek, virgülle ayrılmış ilişkiler (örn. orderPackages,customer,shipping,orderItems).',
+  'Comma-separated relations to include (e.g., orders,customers).':
+    'Dahil edilecek, virgülle ayrılmış ilişkiler (örn. orders,customers).',
   'Comma-separated tag IDs': "Virgülle ayrılmış etiket ID'leri",
   'Comma-separated tag IDs.': "Virgülle ayrılmış etiket ID'leri.",
   'Computed capability flags for the company. Applies to both the company-level e_invoice_serial/e_archive_serial fields above and the same fields on each of the company\'s integrations, since configurability depends solely on the company\'s accounting provider.':
     "Firma için hesaplanmış yetenek bayrakları. Yapılandırılabilirlik yalnızca firmanın muhasebe sağlayıcısına bağlı olduğundan, hem yukarıdaki firma seviyesindeki e_invoice_serial/e_archive_serial alanları için hem de firmanın her entegrasyonundaki aynı alanlar için geçerlidir.",
+  'Create a new order.': 'Yeni bir sipariş oluşturur.',
+  'Create a new product.': 'Yeni bir ürün oluşturur.',
+  "Creates a new stock event for a product. Prefix quantity with '=' for absolute value.":
+    "Bir ürün için yeni bir stok hareketi oluşturur. Mutlak değer için miktarın başına '=' ekleyin.",
   'Cursor-based pagination metadata (used by notifications and some endpoints)':
     'Cursor tabanlı sayfalama meta verisi (bildirimler ve bazı uç noktalarda kullanılır)',
   "Custom e-archive serial prefix. Only accepted when the company's accounting provider supports it (currently QNB, Isnet, TrendyolEFaturam, Mikro, ELogo, UyumsoftEInvoice, HepsiburadaEFaturam). Whether these fields are configurable is exposed on the owning company's `abilities` (see `CompanyResponse`), not per integration, since it depends solely on the company's accounting provider.":
@@ -35,6 +51,8 @@ export const FIELD_TR = {
     'Özel e-fatura seri ön eki. Yalnızca firmanın muhasebe sağlayıcısı desteklediğinde kabul edilir (şu an QNB, Isnet, TrendyolEFaturam, ELogo, UyumsoftEInvoice, HepsiburadaEFaturam).',
   'Customer created': 'Müşteri oluşturuldu',
   'Customers updated': 'Müşteriler güncellendi',
+  'Delete a single order.': 'Tekil siparişi siler.',
+  'Deletes multiple products at once.': 'Birden çok ürünü tek seferde siler.',
   "Documents to include. Use 'slip' for shipping slip, 'invoice' for e-invoice, or both":
     "Dahil edilecek belgeler. Kargo fişi için 'slip', e-fatura için 'invoice' veya her ikisini kullanın",
   'E-invoice scenario (basic or commercial).': 'E-fatura senaryosu (basic veya commercial).',
@@ -42,7 +60,11 @@ export const FIELD_TR = {
   'Expenses by period': 'Döneme göre giderler',
   'Field to sort results by.': 'Sonuçların sıralanacağı alan.',
   'Fields to update on each order.': 'Her siparişte güncellenecek alanlar.',
+  'Filter by accounting ID': "Muhasebe ID'sine göre filtrele",
   'Filter by accounting ID (handles null).': 'Muhasebe ID\'sine göre filtrele (null desteklenir).',
+  'Filter by accounting name': 'Muhasebe adına göre filtrele',
+  'Filter by active status': 'Aktiflik durumuna göre filtrele',
+  'Filter by barcode': 'Barkoda göre filtrele',
   'Filter by cargo code.': 'Kargo koduna göre filtrele.',
   'Filter by cargo company ID.': "Kargo firması ID'sine göre filtrele.",
   'Filter by cargo tracking code.': 'Kargo takip koduna göre filtrele.',
@@ -52,29 +74,48 @@ export const FIELD_TR = {
   'Filter by customer name.': 'Müşteri adına göre filtrele.',
   'Filter by deep category status.': 'Derin kategori durumuna göre filtrele.',
   'Filter by e-invoice status.': 'E-fatura durumuna göre filtrele.',
+  'Filter by fulfillment ID': "Fulfillment ID'sine göre filtrele",
   'Filter by full path.': 'Tam yola göre filtrele.',
+  'Filter by integration ID': "Entegrasyon ID'sine göre filtrele",
   'Filter by integration ID.': "Entegrasyon ID'sine göre filtrele.",
   'Filter by integration product ID.': "Entegrasyon ürünü ID'sine göre filtrele.",
   'Filter by integration.': 'Entegrasyona göre filtrele.',
+  'Filter by market price (supports operators)':
+    'Piyasa fiyatına göre filtrele (operatörleri destekler)',
   'Filter by order identifiers.': 'Sipariş tanımlayıcılarına göre filtrele.',
   'Filter by order package code.': 'Sipariş paketi koduna göre filtrele.',
   'Filter by order type.': 'Sipariş türüne göre filtrele.',
   'Filter by parent category ID.': "Üst kategori ID'sine göre filtrele.",
+  'Filter by parent product ID': "Üst ürün ID'sine göre filtrele",
   'Filter by payment method.': 'Ödeme yöntemine göre filtrele.',
+  'Filter by price (supports operators)': 'Fiyata göre filtrele (operatörleri destekler)',
   'Filter by print date range end.': 'Yazdırma tarih aralığı bitişine göre filtrele.',
   'Filter by print date range start.': 'Yazdırma tarih aralığı başlangıcına göre filtrele.',
   'Filter by print status.': 'Yazdırma durumuna göre filtrele.',
   'Filter by product ID.': "Ürün ID'sine göre filtrele.",
+  'Filter by product UUID': "Ürün UUID'sine göre filtrele",
+  'Filter by product category ID': "Ürün kategorisi ID'sine göre filtrele",
+  'Filter by product name': 'Ürün adına göre filtrele',
+  'Filter by product type': 'Ürün türüne göre filtrele',
   'Filter by push date range end.': 'Gönderim tarih aralığı bitişine göre filtrele.',
   'Filter by push date range start.': 'Gönderim tarih aralığı başlangıcına göre filtrele.',
   'Filter by push-ready flag.': 'Gönderime hazır bayrağına göre filtrele.',
   'Filter by pushed to accounting status.': 'Muhasebeye gönderilme durumuna göre filtrele.',
+  'Filter by quantity (supports operators, e.g. >=10, <=5)':
+    'Miktara göre filtrele (operatörleri destekler, örn. >=10, <=5)',
   'Filter by shipment country code.': 'Gönderi ülke koduna göre filtrele.',
+  'Filter by shipment name': 'Gönderi adına göre filtrele',
   'Filter by shipment status.': 'Gönderi durumuna göre filtrele.',
   'Filter by shipping availability.': 'Kargo uygunluğuna göre filtrele.',
+  'Filter by source integration ID': "Kaynak entegrasyon ID'sine göre filtrele",
   'Filter by specific order ID.': "Belirli bir sipariş ID'sine göre filtrele.",
+  'Filter by stock code': 'Stok koduna göre filtrele',
+  'Filter by tax rate': 'Vergi oranına göre filtrele',
   'Filter by tax rate.': 'Vergi oranına göre filtrele.',
+  'Filter by warehouse ID': "Depo ID'sine göre filtrele",
+  'Filter deleted products': 'Silinmiş ürünleri filtrele',
   'Filter expense orders.': 'Gider siparişlerini filtrele.',
+  'Filter expense type products': 'Gider türündeki ürünleri filtrele',
   'Filter importable products.': 'İçe aktarılabilir ürünleri filtrele.',
   'Filter only zero tax orders.': 'Yalnızca sıfır vergili siparişleri filtrele.',
   'Filter orders created on or after this date.':
@@ -88,7 +129,24 @@ export const FIELD_TR = {
   'Filter orders that need editing.': 'Düzenlenmesi gereken siparişleri filtrele.',
   'Filter orders whose cargo code was cancelled (shipment_status = cancelled), as opposed to orders that never had one.':
     'Kargo kodu iptal edilmiş (shipment_status = cancelled) siparişleri, hiç kodu olmayanların aksine filtrele.',
+  'Filter products NOT synced with this integration ID':
+    "Bu entegrasyon ID'siyle senkronize OLMAYAN ürünleri filtrele",
+  'Filter products off sale in this integration ID':
+    "Bu entegrasyon ID'sinde satışta olmayan ürünleri filtrele",
+  'Filter products on sale in this integration ID':
+    "Bu entegrasyon ID'sinde satıştaki ürünleri filtrele",
+  'Filter products synced with this integration ID':
+    "Bu entegrasyon ID'siyle senkronize ürünleri filtrele",
+  'Filter products that have catalog matches': 'Katalog eşleşmesi olan ürünleri filtrele',
+  'Filter products that have images': 'Görseli olan ürünleri filtrele',
+  'Filter products that have stock': 'Stoğu olan ürünleri filtrele',
+  'Filter products with price mismatch with integration':
+    'Entegrasyonla fiyat uyuşmazlığı olan ürünleri filtrele',
+  'Filter products with quantity mismatch with integration':
+    'Entegrasyonla miktar uyuşmazlığı olan ürünleri filtrele',
   'Filter sale orders.': 'Satış siparişlerini filtrele.',
+  'Filter soft-deleted products': 'Silinmiş (soft-delete) ürünleri filtrele',
+  'Generate e-invoices for the specified orders.': 'Belirtilen siparişler için e-fatura oluşturur.',
   'Images updated successfully': 'Görseller başarıyla güncellendi',
   'Include archived items': 'Arşivlenmiş öğeleri dahil et',
   'Include archived orders.': 'Arşivlenmiş siparişleri dahil et.',
@@ -136,6 +194,7 @@ export const FIELD_TR = {
   'Paginated array of product categories': 'Sayfalanmış ürün kategorisi dizisi',
   'Paginated list of categories.': 'Sayfalanmış kategori listesi.',
   'Paginated list of integration products.': 'Sayfalanmış entegrasyon ürünü listesi.',
+  'Paginated list of products': 'Sayfalanmış ürün listesi',
   'Paginated list of stock events': 'Sayfalanmış stok hareketi listesi',
   'Payment created': 'Ödeme oluşturuldu',
   'Payment information.': 'Ödeme bilgisi.',
@@ -150,7 +209,25 @@ export const FIELD_TR = {
   'Products restored successfully': 'Ürünler başarıyla geri yüklendi',
   'Products updated successfully': 'Ürünler başarıyla güncellendi',
   'Products updated.': 'Ürünler güncellendi.',
+  'Pull the latest order data from the connected integration.':
+    'Bağlı entegrasyondan en güncel sipariş verisini çeker.',
+  'Push one or more orders to the connected accounting integration.':
+    'Bir veya daha fazla siparişi bağlı muhasebe entegrasyonuna gönderir.',
   'Relations to include.': 'Dahil edilecek ilişkiler.',
+  'Restores multiple previously deleted products.':
+    'Daha önce silinmiş birden çok ürünü geri yükler.',
+  'Retrieve a paginated list of orders using cursor pagination.':
+    'Cursor sayfalama kullanarak sayfalanmış sipariş listesi getirir.',
+  'Retrieve a single order by its identifier.': 'Tekil siparişi tanımlayıcısına göre getirir.',
+  'Returns a cursor-paginated list of customers.': 'Cursor ile sayfalanmış müşteri listesi döner.',
+  'Returns a paginated list of products using cursor pagination.':
+    'Cursor sayfalama kullanarak sayfalanmış ürün listesi döner.',
+  'Returns a paginated list of stock events for a product.':
+    'Bir ürün için sayfalanmış stok hareketi listesi döner.',
+  'Returns a single product by ID.': "Tekil ürünü ID'sine göre döner.",
+  'Returns all images for a product.': 'Bir ürünün tüm görsellerini döner.',
+  'Returns counts of products grouped by status.':
+    'Ürünlerin duruma göre gruplanmış sayılarını döner.',
   'Sale count': 'Satış adedi',
   'Sales by category': 'Kategoriye göre satışlar',
   'Sales by integration': 'Entegrasyona göre satışlar',
@@ -161,10 +238,13 @@ export const FIELD_TR = {
   'Search in name, stock_code, barcode, marketplace_product_id.':
     'İsim, stok kodu, barkod, marketplace_product_id alanlarında ara.',
   'Search in name.': 'İsimde ara.',
+  'Search query string': 'Arama sorgusu metni',
   'Shipping address details.': 'Kargo adresi detayları.',
   'Shipping updated successfully.': 'Kargo başarıyla güncellendi.',
   'Sort field, prefix with - for desc (e.g. -created_at)':
     'Sıralama alanı; azalan için başına - ekleyin (örn. -created_at)',
+  'Sort field, prefix with - for desc (e.g. -created_at,name)':
+    'Sıralama alanı; azalan için başına - ekleyin (örn. -created_at,name)',
   'Sort field.': 'Sıralama alanı.',
   'Sort field. Prefix with - for descending order.':
     'Sıralama alanı. Azalan sıralama için başına - ekleyin.',
@@ -185,6 +265,11 @@ export const FIELD_TR = {
   'The order package identifier.': 'Sipariş paketi tanımlayıcısı.',
   'Total expense amount': 'Toplam gider tutarı',
   'Total income amount': 'Toplam gelir tutarı',
+  'Update an existing order.': 'Mevcut bir siparişi günceller.',
+  'Update multiple orders at once.': 'Birden çok siparişi tek seferde günceller.',
+  'Updates a single product.': 'Tekil ürünü günceller.',
+  'Updates multiple products at once.': 'Birden çok ürünü tek seferde günceller.',
+  'Updates the images for a product.': 'Bir ürünün görsellerini günceller.',
   'Use portrait orientation': 'Dikey yönlendirme kullan',
   'Warehouse created': 'Depo oluşturuldu',
   'Warehouse details': 'Depo detayları',

@@ -2945,13 +2945,388 @@
     }
   },
   "paths": {
+    "/v1.0/company/{companyId}/product": {
+      "get": {
+        "tags": [
+          "Ürün"
+        ],
+        "summary": "Ürünleri listele",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nCursor sayfalama kullanarak sayfalanmış ürün listesi döner.",
+        "operationId": "listProducts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            },
+            "description": "Sayfa başına öğe sayısı"
+          },
+          {
+            "name": "integration_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Entegrasyon ID'sine göre filtrele"
+          },
+          {
+            "name": "has_stock",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Stoğu olan ürünleri filtrele"
+          },
+          {
+            "name": "has_image",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Görseli olan ürünleri filtrele"
+          },
+          {
+            "name": "has_catalog_match",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Katalog eşleşmesi olan ürünleri filtrele"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Arama sorgusu metni"
+          },
+          {
+            "name": "product_category_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Ürün kategorisi ID'sine göre filtrele"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "main",
+                "basic",
+                "variant",
+                "expense"
+              ]
+            },
+            "description": "Ürün türüne göre filtrele"
+          },
+          {
+            "name": "is_active",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Aktiflik durumuna göre filtrele"
+          },
+          {
+            "name": "deleted",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Silinmiş ürünleri filtrele"
+          },
+          {
+            "name": "barcode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Barkoda göre filtrele"
+          },
+          {
+            "name": "stock_code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Stok koduna göre filtrele"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Ürün adına göre filtrele"
+          },
+          {
+            "name": "accounting_name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Muhasebe adına göre filtrele"
+          },
+          {
+            "name": "parent_product_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Üst ürün ID'sine göre filtrele"
+          },
+          {
+            "name": "accounting_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Muhasebe ID'sine göre filtrele"
+          },
+          {
+            "name": "quantity",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Miktara göre filtrele (operatörleri destekler, örn. >=10, <=5)"
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Ürün UUID'sine göre filtrele"
+          },
+          {
+            "name": "price",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "description": "Fiyata göre filtrele (operatörleri destekler)"
+          },
+          {
+            "name": "market_price",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "description": "Piyasa fiyatına göre filtrele (operatörleri destekler)"
+          },
+          {
+            "name": "fulfillment_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Fulfillment ID'sine göre filtrele"
+          },
+          {
+            "name": "tax_rate",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1,
+                10,
+                20
+              ]
+            },
+            "description": "Vergi oranına göre filtrele"
+          },
+          {
+            "name": "shipment_name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Gönderi adına göre filtrele"
+          },
+          {
+            "name": "warehouse_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Depo ID'sine göre filtrele"
+          },
+          {
+            "name": "source_integration_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Kaynak entegrasyon ID'sine göre filtrele"
+          },
+          {
+            "name": "synced_with",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Bu entegrasyon ID'siyle senkronize ürünleri filtrele"
+          },
+          {
+            "name": "not_synced_with",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Bu entegrasyon ID'siyle senkronize OLMAYAN ürünleri filtrele"
+          },
+          {
+            "name": "on_sale",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Bu entegrasyon ID'sinde satıştaki ürünleri filtrele"
+          },
+          {
+            "name": "off_sale",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Bu entegrasyon ID'sinde satışta olmayan ürünleri filtrele"
+          },
+          {
+            "name": "ids",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Virgülle ayrılmış ürün UUID'leri"
+          },
+          {
+            "name": "is_expense",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Gider türündeki ürünleri filtrele"
+          },
+          {
+            "name": "different_quantity",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Entegrasyonla miktar uyuşmazlığı olan ürünleri filtrele"
+          },
+          {
+            "name": "different_price",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Entegrasyonla fiyat uyuşmazlığı olan ürünleri filtrele"
+          },
+          {
+            "name": "is_archived",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Silinmiş (soft-delete) ürünleri filtrele"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Sıralama alanı; azalan için başına - ekleyin (örn. -created_at,name)"
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Dahil edilecek, virgülle ayrılmış ilişkiler"
+          },
+          {
+            "name": "with_trashed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Silinmiş (soft-delete) öğeleri dahil et"
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Arşivlenmiş öğeleri dahil et"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sayfalanmış ürün listesi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProductResponse"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "cursor": {
+                          "type": "object",
+                          "properties": {
+                            "next": {
+                              "type": "string",
+                              "nullable": true
+                            },
+                            "prev": {
+                              "type": "string",
+                              "nullable": true
+                            },
+                            "count": {
+                              "type": "integer"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v2.0/company/{companyId}/product": {
       "post": {
         "tags": [
           "Ürün"
         ],
         "summary": "Ürün oluştur",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nCreate a new product.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nYeni bir ürün oluşturur.",
         "operationId": "createProduct",
         "parameters": [
           {
@@ -2991,7 +3366,7 @@
           "Ürün"
         ],
         "summary": "Toplu ürün güncelleme",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nUpdates multiple products at once.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nBirden çok ürünü tek seferde günceller.",
         "operationId": "bulkUpdateProducts",
         "parameters": [
           {
@@ -3032,7 +3407,7 @@
           "Ürün"
         ],
         "summary": "Toplu ürün silme",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nDeletes multiple products at once.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nBirden çok ürünü tek seferde siler.",
         "operationId": "bulkDeleteProducts",
         "parameters": [
           {
@@ -3075,7 +3450,7 @@
           "Ürün"
         ],
         "summary": "Ürün durum sayıları",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nReturns counts of products grouped by status.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nÜrünlerin duruma göre gruplanmış sayılarını döner.",
         "operationId": "getProductStatusCounts",
         "parameters": [
           {
@@ -3102,7 +3477,7 @@
           "Ürün"
         ],
         "summary": "Toplu ürün geri yükleme",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nRestores multiple previously deleted products.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nDaha önce silinmiş birden çok ürünü geri yükler.",
         "operationId": "bulkRestoreProducts",
         "parameters": [
           {
@@ -3145,7 +3520,7 @@
           "Ürün"
         ],
         "summary": "Ürün getir",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nReturns a single product by ID.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nTekil ürünü ID'sine göre döner.",
         "operationId": "getProduct",
         "parameters": [
           {
@@ -3153,6 +3528,14 @@
           },
           {
             "$ref": "#/components/parameters/productId"
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Dahil edilecek, virgülle ayrılmış ilişkiler (örn. category,images,integrationProducts)."
           }
         ],
         "responses": {
@@ -3178,7 +3561,7 @@
           "Ürün"
         ],
         "summary": "Ürün güncelle",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nUpdates a single product.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nTekil ürünü günceller.",
         "operationId": "updateProduct",
         "parameters": [
           {
@@ -3294,7 +3677,7 @@
           "Ürün"
         ],
         "summary": "Ürün görsellerini getir",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nReturns all images for a product.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nBir ürünün tüm görsellerini döner.",
         "operationId": "getProductImages",
         "parameters": [
           {
@@ -3347,7 +3730,7 @@
           "Ürün"
         ],
         "summary": "Ürün görsellerini güncelle",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nUpdates the images for a product.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nBir ürünün görsellerini günceller.",
         "operationId": "updateProductImages",
         "parameters": [
           {
@@ -3403,7 +3786,7 @@
           "Ürün"
         ],
         "summary": "Stok hareketlerini listele",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nReturns a paginated list of stock events for a product.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nBir ürün için sayfalanmış stok hareketi listesi döner.",
         "operationId": "listStockEvents",
         "parameters": [
           {
@@ -3494,7 +3877,7 @@
           "Ürün"
         ],
         "summary": "Stok hareketi oluştur",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nCreates a new stock event for a product. Prefix quantity with '=' for absolute value.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nBir ürün için yeni bir stok hareketi oluşturur. Mutlak değer için miktarın başına '=' ekleyin.",
         "operationId": "createStockEvent",
         "parameters": [
           {
@@ -3539,7 +3922,7 @@
           "Sipariş"
         ],
         "summary": "Siparişleri listele",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nRetrieve a paginated list of orders using cursor pagination.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nCursor sayfalama kullanarak sayfalanmış sipariş listesi getirir.",
         "operationId": "listOrders",
         "parameters": [
           {
@@ -3953,7 +4336,7 @@
           "Sipariş"
         ],
         "summary": "Sipariş oluştur",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nCreate a new order.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nYeni bir sipariş oluşturur.",
         "operationId": "createOrder",
         "parameters": [
           {
@@ -3993,7 +4376,7 @@
           "Sipariş"
         ],
         "summary": "Toplu sipariş güncelleme",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nUpdate multiple orders at once.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nBirden çok siparişi tek seferde günceller.",
         "operationId": "bulkUpdateOrders",
         "parameters": [
           {
@@ -4039,7 +4422,7 @@
           "Sipariş"
         ],
         "summary": "Sipariş getir",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nRetrieve a single order by its identifier.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nTekil siparişi tanımlayıcısına göre getirir.",
         "operationId": "getOrder",
         "parameters": [
           {
@@ -4047,6 +4430,14 @@
           },
           {
             "$ref": "#/components/parameters/orderId"
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Dahil edilecek, virgülle ayrılmış ilişkiler (örn. orderPackages,customer,shipping,orderItems)."
           }
         ],
         "responses": {
@@ -4072,7 +4463,7 @@
           "Sipariş"
         ],
         "summary": "Sipariş güncelle",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nUpdate an existing order.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nMevcut bir siparişi günceller.",
         "operationId": "updateOrder",
         "parameters": [
           {
@@ -4115,7 +4506,7 @@
           "Sipariş"
         ],
         "summary": "Sipariş sil",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nDelete a single order.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nTekil siparişi siler.",
         "operationId": "deleteOrder",
         "parameters": [
           {
@@ -4138,7 +4529,7 @@
           "Sipariş"
         ],
         "summary": "Tekil sipariş iptali",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nCancel a single order.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nTekil siparişi iptal eder.",
         "operationId": "cancelOrder",
         "parameters": [
           {
@@ -4161,7 +4552,7 @@
           "Sipariş"
         ],
         "summary": "Entegrasyondan sipariş çek",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nPull the latest order data from the connected integration.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nBağlı entegrasyondan en güncel sipariş verisini çeker.",
         "operationId": "pullOrder",
         "parameters": [
           {
@@ -4196,7 +4587,7 @@
           "Sipariş"
         ],
         "summary": "Siparişleri muhasebeye gönder",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nPush one or more orders to the connected accounting integration.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nBir veya daha fazla siparişi bağlı muhasebe entegrasyonuna gönderir.",
         "operationId": "pushOrders",
         "parameters": [
           {
@@ -4226,7 +4617,7 @@
           "Sipariş"
         ],
         "summary": "E-fatura oluştur",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nGenerate e-invoices for the specified orders.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nBelirtilen siparişler için e-fatura oluşturur.",
         "operationId": "generateEInvoice",
         "parameters": [
           {
@@ -4256,7 +4647,7 @@
           "Müşteri"
         ],
         "summary": "Müşterileri listele",
-        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nReturns a cursor-paginated list of customers.",
+        "description": "> **Gerekli kapsam:** herhangi bir API App anahtarı\n\nCursor ile sayfalanmış müşteri listesi döner.",
         "parameters": [
           {
             "name": "companyId",
@@ -4316,7 +4707,8 @@
             "in": "query",
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Dahil edilecek, virgülle ayrılmış ilişkiler (örn. integration,tags)."
           },
           {
             "name": "with_trashed",
@@ -4518,6 +4910,14 @@
             "schema": {
               "type": "integer"
             }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Dahil edilecek, virgülle ayrılmış ilişkiler (örn. customer,account)."
           }
         ],
         "responses": {
@@ -5612,6 +6012,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Dahil edilecek, virgülle ayrılmış ilişkiler (örn. orders,customers)."
           }
         ],
         "responses": {
@@ -5716,6 +6124,14 @@
             "schema": {
               "type": "integer"
             }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Dahil edilecek, virgülle ayrılmış ilişkiler (örn. orders,customers)."
           }
         ],
         "responses": {
@@ -6097,6 +6513,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Dahil edilecek, virgülle ayrılmış ilişkiler (örn. integrations,integrationProductCategory)."
           }
         ],
         "responses": {
@@ -6240,6 +6664,14 @@
             "schema": {
               "type": "integer"
             }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Dahil edilecek, virgülle ayrılmış ilişkiler (örn. integrations,integrationProductCategory)."
           }
         ],
         "responses": {

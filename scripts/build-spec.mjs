@@ -107,6 +107,7 @@ const SUMMARIES_TR = {
   'List integration warehouses': 'Entegrasyon depolarını listele',
   'List orders': 'Siparişleri listele',
   'List product categories': 'Ürün kategorilerini listele',
+  'List products': 'Ürünleri listele',
   'List shippable orders': 'Kargolanabilir siparişleri listele',
   'List stock events': 'Stok hareketlerini listele',
   'List tags': 'Etiketleri listele',

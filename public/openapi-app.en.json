@@ -2972,6 +2972,381 @@
     }
   },
   "paths": {
+    "/v1.0/company/{companyId}/product": {
+      "get": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "List products",
+        "description": "> **Required scope:** any API-App key\n\nReturns a paginated list of products using cursor pagination.",
+        "operationId": "listProducts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            },
+            "description": "Number of items per page"
+          },
+          {
+            "name": "integration_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by integration ID"
+          },
+          {
+            "name": "has_stock",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter products that have stock"
+          },
+          {
+            "name": "has_image",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter products that have images"
+          },
+          {
+            "name": "has_catalog_match",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter products that have catalog matches"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search query string"
+          },
+          {
+            "name": "product_category_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by product category ID"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "main",
+                "basic",
+                "variant",
+                "expense"
+              ]
+            },
+            "description": "Filter by product type"
+          },
+          {
+            "name": "is_active",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter by active status"
+          },
+          {
+            "name": "deleted",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter deleted products"
+          },
+          {
+            "name": "barcode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by barcode"
+          },
+          {
+            "name": "stock_code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by stock code"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by product name"
+          },
+          {
+            "name": "accounting_name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by accounting name"
+          },
+          {
+            "name": "parent_product_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Filter by parent product ID"
+          },
+          {
+            "name": "accounting_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by accounting ID"
+          },
+          {
+            "name": "quantity",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by quantity (supports operators, e.g. >=10, <=5)"
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Filter by product UUID"
+          },
+          {
+            "name": "price",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "description": "Filter by price (supports operators)"
+          },
+          {
+            "name": "market_price",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "description": "Filter by market price (supports operators)"
+          },
+          {
+            "name": "fulfillment_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by fulfillment ID"
+          },
+          {
+            "name": "tax_rate",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1,
+                10,
+                20
+              ]
+            },
+            "description": "Filter by tax rate"
+          },
+          {
+            "name": "shipment_name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by shipment name"
+          },
+          {
+            "name": "warehouse_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by warehouse ID"
+          },
+          {
+            "name": "source_integration_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by source integration ID"
+          },
+          {
+            "name": "synced_with",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter products synced with this integration ID"
+          },
+          {
+            "name": "not_synced_with",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter products NOT synced with this integration ID"
+          },
+          {
+            "name": "on_sale",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter products on sale in this integration ID"
+          },
+          {
+            "name": "off_sale",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter products off sale in this integration ID"
+          },
+          {
+            "name": "ids",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated product UUIDs"
+          },
+          {
+            "name": "is_expense",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter expense type products"
+          },
+          {
+            "name": "different_quantity",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter products with quantity mismatch with integration"
+          },
+          {
+            "name": "different_price",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter products with price mismatch with integration"
+          },
+          {
+            "name": "is_archived",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter soft-deleted products"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Sort field, prefix with - for desc (e.g. -created_at,name)"
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated relations to include"
+          },
+          {
+            "name": "with_trashed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Include soft-deleted items"
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Include archived items"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of products",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProductResponse"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "cursor": {
+                          "type": "object",
+                          "properties": {
+                            "next": {
+                              "type": "string",
+                              "nullable": true
+                            },
+                            "prev": {
+                              "type": "string",
+                              "nullable": true
+                            },
+                            "count": {
+                              "type": "integer"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v2.0/company/{companyId}/product": {
       "post": {
         "tags": [
@@ -3180,6 +3555,14 @@
           },
           {
             "$ref": "#/components/parameters/productId"
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated relations to include (e.g., category,images,integrationProducts)."
           }
         ],
         "responses": {
@@ -4074,6 +4457,14 @@
           },
           {
             "$ref": "#/components/parameters/orderId"
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated relations to include (e.g., orderPackages,customer,shipping,orderItems)."
           }
         ],
         "responses": {
@@ -4343,7 +4734,8 @@
             "in": "query",
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Comma-separated relations to include (e.g., integration,tags)."
           },
           {
             "name": "with_trashed",
@@ -4545,6 +4937,14 @@
             "schema": {
               "type": "integer"
             }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated relations to include (e.g., customer,account)."
           }
         ],
         "responses": {
@@ -5639,6 +6039,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated relations to include (e.g., orders,customers)."
           }
         ],
         "responses": {
@@ -5743,6 +6151,14 @@
             "schema": {
               "type": "integer"
             }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated relations to include (e.g., orders,customers)."
           }
         ],
         "responses": {
@@ -6124,6 +6540,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated relations to include (e.g., integrations,integrationProductCategory)."
           }
         ],
         "responses": {
@@ -6267,6 +6691,14 @@
             "schema": {
               "type": "integer"
             }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated relations to include (e.g., integrations,integrationProductCategory)."
           }
         ],
         "responses": {
